@@ -25,7 +25,7 @@ export default function CodeEditor() {
   const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(true);
   const navigate = useNavigate(); // ⬅️ added
 
   useEffect(() => {

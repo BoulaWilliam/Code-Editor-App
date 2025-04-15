@@ -6,6 +6,9 @@ import toast from "react-hot-toast";
 import { useNavigate, NavLink } from "react-router-dom";
 import { userContext } from "../../Contexts/UserContext/User.context";
 
+// Google Image
+import Google from '../../assets/Google.png'
+
 export default function Login() {
     const navigate = useNavigate();
     const { setToken } = useContext(userContext);
@@ -27,7 +30,7 @@ export default function Login() {
             );
 
             if (data.statusCode === 200) {
-                toast.success("User Created Successfully!");
+                toast.success("User Logged In Successfully!");
                 localStorage.setItem("userToken", data.token);
                 setToken(data.token);
                 setTimeout(() => {
@@ -35,7 +38,7 @@ export default function Login() {
                 }, 2000);
             }
         } catch (error) {
-            toast.error(error.response?.data?.message);
+            toast.error(error.response?.data?.message || "Login Failed");
         } finally {
             toast.dismiss(loadingToastId);
         }
@@ -51,58 +54,96 @@ export default function Login() {
     });
 
     return (
-        <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-lg shadow-lg p-8 w-full max-w-md text-gray-200">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-100">
-            <i className="fa-regular fa-circle-user"></i> Login Now
-        </h2>
-        <form onSubmit={formik.handleSubmit} className="space-y-4">
-            {/* Username */}
-            <div>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    {...formik.getFieldProps("username")}
-                    className="w-full bg-gray-800 text-white placeholder-gray-400 p-3 rounded focus:ring-2 focus:ring-purple-500"
-                />
-                {formik.touched.username && formik.errors.username && (
-                    <p className="text-red-500 text-sm mt-1">
-                        {formik.errors.username}
-                    </p>
-                )}
-            </div>
+        <div className="bg-[#4B4B4B] rounded-lg shadow-[0_4px_8px_#00000029] p-8 w-full max-w-md text-gray-200">
+            <h2 className="text-3xl  font-bold text-center mb-6 bg-gradient-to-r from-[#08AEED] to-[#09E190] bg-clip-text text-transparent">
+                <i className="fa-regular fa-circle-user  text-white"></i> Login
+            </h2>
 
-            {/* Password */}
-            <div>
-                <input
-                    type="password"
-                    placeholder="Password"
-                    {...formik.getFieldProps("password")}
-                    className="w-full bg-gray-800 text-white placeholder-gray-400 p-3 rounded focus:ring-2 focus:ring-purple-500"
-                />
-                {formik.touched.password && formik.errors.password && (
-                    <p className="text-red-500 text-sm mt-1">
-                        {formik.errors.password}
-                    </p>
-                )}
-            </div>
+            <form onSubmit={formik.handleSubmit} className="space-y-4">
+                {/* Username */}
+                <div className="relative">
+                    <i className="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        {...formik.getFieldProps("username")}
+                        className="w-full pl-10 text-black placeholder-gray-400 p-3 rounded focus:text-[#08AEED]"
+                    />
+                    {formik.touched.username && formik.errors.username && (
+                        <p className="text-red-600 text-md mt-1">
+                            {formik.errors.username}
+                        </p>
+                    )}
+                </div>
 
-            {/* Login Button */}
-            <button
-                type="submit"
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded transition-transform transform hover:scale-105"
-                disabled={formik.isSubmitting}
-            >
-                Login
-            </button>
+                {/* Password */}
+                <div className="relative">
+                    <i className="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        {...formik.getFieldProps("password")}
+                        className="w-full pl-10 text-black placeholder-gray-400 p-3 rounded"
+                    />
+                    {formik.touched.password && formik.errors.password && (
+                        <p className="text-red-500 text-sm mt-1">
+                            {formik.errors.password}
+                        </p>
+                    )}
+                </div>
 
-            {/* Register Link */}
-            <NavLink
-                to="/register"
-                className="block text-center text-gray-300 hover:text-gray-100 mt-2"
-            >
-                Don't Have an Account?
-            </NavLink>
-        </form>
-    </div>
+                {/* Remember Me + Forgot Password */}
+                <div className="flex items-center justify-between text-sm text-gray-300">
+                    <label className="flex items-center space-x-2">
+                        <input type="checkbox" className="accent-[#08AEED]" />
+                        <span>Remember Me</span>
+                    </label>
+                    <NavLink to="/forgot-password" className="hover:underline text-[#09E190]">
+                        Forgot Password?
+                    </NavLink>
+                </div>
+
+                {/* Login Button */}
+                <button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-[#08AEED] to-[#09E190] text-white py-3 rounded transition-transform transform hover:scale-105"
+                    disabled={formik.isSubmitting}
+                >
+                    <i className="fas fa-sign-in-alt mr-2"></i> Login
+                </button>
+
+                {/* OR Divider */}
+                <div className="flex items-center my-4">
+                    <hr className="flex-grow border-white" />
+                    <span className="mx-2 text-white text-md">OR</span>
+                    <hr className="flex-grow border-white" />
+                </div>
+
+                {/* Sign in with Google */}
+                <div className="flex justify-center">
+                    <button
+                        type="button"
+                        className="w-10 h-10 flex items-center justify-center  rounded hover:scale-125 transition-all duration-200 "
+                    >
+                        <img
+                            src={Google}
+                            alt="Sign in with Google"
+                            className="w-[40px]  object-cover"
+                        />
+                    </button>
+                </div>
+
+
+
+                {/* Don't have account */}
+                <NavLink
+                    to="/register"
+                    className="block text-center text-gray-300 hover:text-gray-100 mt-4 text-sm"
+                >
+                    Don’t have an account? <span className="text-[#08AEED] hover:underline">Sign up</span>
+                </NavLink>
+            </form>
+
+        </div>
     );
 }

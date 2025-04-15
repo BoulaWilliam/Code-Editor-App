@@ -13,8 +13,9 @@
 }
 body {
   font-family: 'Encode Sans Expanded', sans-serif;
-  overflow-x: hidden;
+  overflow: hidden;
   min-height: 100vh;
   position: relative;
-  background: #00010eee;
+  background: #444444;
 }
+
