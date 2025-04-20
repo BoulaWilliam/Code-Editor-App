@@ -1,7 +1,10 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { useNavigate } from "react-router-dom";
 
 export default function NotFound404() {
+    const navigate = useNavigate();
+
     const digit1 = useRef(null);
     const digit2 = useRef(null);
     const digit3 = useRef(null);
@@ -22,7 +25,7 @@ export default function NotFound404() {
     }, []);
 
     return (
-        <div className="flex flex-col items-center justify-center  bg-transparent backdrop-blur-xl text-white relative overflow-hidden">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-transparent backdrop-blur-xl text-white relative overflow-hidden">
             <div className="flex gap-6 text-[8rem] md:text-[12rem] font-black">
                 <span
                     ref={digit1}
@@ -51,12 +54,12 @@ export default function NotFound404() {
                 The page you're looking for isn’t here. Maybe it got lost in the matrix.
             </p>
 
-            <a
-                href="/"
+            <button
+                onClick={() => navigate("/login")}
                 className="mt-10 px-6 py-3 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-semibold shadow-xl hover:scale-105 transition-all duration-300"
             >
-                Return Home
-            </a>
+                Return to Login
+            </button>
         </div>
     );
 }

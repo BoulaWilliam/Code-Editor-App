@@ -49,7 +49,7 @@ export default function Navbar() {
             <nav className={`fixed top-0 left-0 w-full z-50 text-white bg-[#3E3E3E] shadow-md transition-all duration-300 ${isMenuOpen ? 'h-auto' : 'h-20'}`}>
                 <div className='flex justify-between items-center px-8 md:px-32'>
                     {/* Logo */}
-                    <NavLink to="/code" className="flex items-center justify-between">
+                    <NavLink to="/home" className="flex items-center justify-between">
                         <img src={Logo} className='w-[80px] object-cover' alt="Logo" />
                         <h1 className="text-xl font-bold ml-2 bg-gradient-to-r from-[#08AEED] to-[#09E190] bg-clip-text text-transparent">
                             CodeFlow

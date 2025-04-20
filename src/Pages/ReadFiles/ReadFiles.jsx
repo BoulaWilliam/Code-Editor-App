@@ -33,7 +33,9 @@ export default function ReadFiles() {
         fetchFiles();
     }, [token]);
 
-    return (
+    return (    
+        <>
+        <div className='container flex items-center justify-center flex-grow'>
         <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg">
             <h2 className="text-2xl font-bold mb-6">All Files</h2>
             {error && <div className="text-red-500 mb-4">❌ {error}</div>}
@@ -53,5 +55,7 @@ export default function ReadFiles() {
                 </ul>
             )}
         </div>
+        </div>
+        </>
     );
 }

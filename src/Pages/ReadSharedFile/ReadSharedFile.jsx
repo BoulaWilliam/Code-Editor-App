@@ -23,6 +23,8 @@ export default function ReadSharedFile() {
     };
 
     return (
+        <>
+        <div className='container flex items-center justify-center flex-grow'>
         <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg">
             <h2 className="text-2xl font-bold mb-6">Read Shared File</h2>
             <input
@@ -49,5 +51,7 @@ export default function ReadSharedFile() {
                 </div>
             )}
         </div>
+        </div>
+        </>
     );
 }

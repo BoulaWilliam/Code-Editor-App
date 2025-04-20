@@ -4,18 +4,42 @@
 
 @layer components{
   .btn{
-    @apply px-3 py-1 rounded-md bg-slate-200 hover:bg-slate-300 transition-colors duration-300;
+    @apply px-3 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 transition-colors duration-300;
   }
 
   .form-control{
     @apply px-2 py-1 rounded-md focus:outline-none border-2 border-slate-400 border-opacity-50 focus:border-primary-600 focus:caret-primary-700
   }
 }
+* {
+  box-sizing: border-box;
+}
 body {
   font-family: 'Encode Sans Expanded', sans-serif;
   overflow: hidden;
   min-height: 100vh;
   position: relative;
+  width: 100%;
   background: #444444;
+}
+
+#home {
+  position: absolute;
+  left: 8%;
+  top: 25%;
+}
+#home .start{
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all .5s ease;
+  background: #444444;
+  border:  2px  solid #08AEED;
+
+}
+#home .start:hover{
+  background: linear-gradient(#08AEED,#09E190);
+  border:  none;
+  outline: none;
 }
 

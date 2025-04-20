@@ -1,5 +1,5 @@
 import './App.css';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import CodeEditor from './Pages/CodeEditor/CodeEditor';
 import Layout from './Components/Layout/Layout';
 import Login from './Pages/Login/Login';
@@ -12,55 +12,60 @@ import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute';
 import GuestRoute from './Components/GuestRoute/GuestRoute';
 import NotFound from './Components/NotFound/NotFound';
+import Home from './Pages/Home/Home';
 
 function App() {
-  const router = createBrowserRouter([
+  const router = createBrowserRouter(
+    [
+      // 🔁 Default redirect to /home
+      {
+        path: '/',
+        element: <Navigate to="/home" />,
+      },
+
+      {
+        path: '/',
+        element: (
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        ),
+        children: [
+          { path: 'code', element: <CodeEditor /> },
+          { path: 'CreateFile', element: <CreateFile /> },
+          { path: 'ReadFiles', element: <ReadFiles /> },
+        ],
+      },
+      {
+        path: '/',
+        element: (
+          <GuestRoute>
+            <Layout />
+          </GuestRoute>
+        ),
+        children: [
+          { path: 'home', element: <Home /> },
+          { path: 'login', element: <Login /> },
+          { path: 'register', element: <Register /> },
+          { path: '*', element: <NotFound /> },
+        ],
+      },
+      {
+        path: '/',
+        element: <Layout />,
+        children: [{ path: 'ReadShared', element: <ReadSharedFile /> }],
+      },
+    ],
     {
-      path: '/',
-      element: (
-        // {You Must Be Authorized To Access These Pages}
-        <ProtectedRoute>
-          <Layout />
-        </ProtectedRoute>
-      ),
-      children: [
-        { index: true, element: <CodeEditor /> },
-        { path: 'code', element: <CodeEditor /> },
-        { path: 'CreateFile', element: <CreateFile /> },
-        { path: 'ReadFiles', element: <ReadFiles /> },
-      ],
-    },
-
-    {
-      path: '/',
-      element: (
-        // {You Don't Have to Be Authorized To Access These Pages}
-        <GuestRoute>
-          <Layout />
-        </GuestRoute>
-      ),
-      children: [
-        { path: 'login', element: <Login /> },
-        { path: 'register', element: <Register /> },
-        { path: '*', element: <NotFound /> },
-      ],
-    },
-
-    // Make ReadSharedFile accessible to both protected and guest routes
-    {path:'/',element:<Layout/>,children:
-      [
-    { path: 'ReadShared', element: <ReadSharedFile /> },
-
-      ]}
-  ]);
+      basename: '/Code-Editor-App', // If deployed in subdirectory
+    }
+  );
 
   return (
-    <>
-      <UserProvider>
-        <Toaster />
-        <RouterProvider router={router} />
-      </UserProvider>
-    </>
+    <UserProvider>
+      <Toaster />
+      <RouterProvider router={router} />
+    </UserProvider>
   );
 }
 

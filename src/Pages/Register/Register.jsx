@@ -53,6 +53,8 @@ export default function Register() {
     });
 
     return (
+        <>
+        <div className="container flex items-center justify-center flex-grow">
         <div className="bg-[#4B4B4B] rounded-lg shadow-[0_4px_8px_#00000029] p-8 w-full max-w-md text-gray-200">
             <h2 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-[#08AEED] to-[#09E190] bg-clip-text text-transparent">
                 <i className="fa-regular fa-circle-user text-white"></i> Register Now
@@ -138,5 +140,7 @@ export default function Register() {
                 </NavLink>
             </form>
         </div>
+        </div>
+        </>
     );
 }

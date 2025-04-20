@@ -63,83 +63,71 @@ export default function CodeEditor() {
   const lines = code.split('\n');
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-10 flex flex-col md:flex-row gap-8">
-      {/* Sidebar */}
-      <aside className="md:w-1/4 w-full h-fit bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-3xl p-6 shadow-2xl">
-        <h3
-          className="text-2xl font-bold mb-6 text-center cursor-pointer"
+  <div className="flex h-screen overflow-hidden">
+    {/* Sidebar */}
+    <aside className="w-16 bg-[#1e1e1e] flex flex-col items-center justify-between py-4">
+      <div className="flex flex-col items-center gap-6">
+        {/* Logo placeholder */}
+        <div className="w-6 h-6 bg-cyan-500 rounded-full" />
+        {/* Select Language Button */}
+        <button
           onClick={() => setIsLanguageOpen(prev => !prev)}
+          className="text-xs bg-gray-800 text-white py-1 px-2 rounded-md shadow"
         >
-          Languages
-        </h3>
+          + Select Language
+        </button>
+      </div>
+    </aside>
 
-        {isLanguageOpen && (
-          <div className="mt-4 flex flex-col gap-4">
-            {Object.keys(defaultSnippets).map((lang) => (
-              <button
-                key={lang}
-                onClick={() => setLanguage(lang)}
-                className={`flex items-center gap-3 text-lg px-4 py-2 rounded-xl transition-all duration-300 ${
-                  language === lang
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'hover:bg-gray-700'
-                }`}
-              >
-                <i className={`${languageIcons[lang]} text-xl`} />
-                {lang.charAt(0).toUpperCase() + lang.slice(1)}
-              </button>
-            ))}
-          </div>
-        )}
-      </aside>
+    {/* Code and Output Sections */}
+    <div className="flex flex-1">
+      {/* Left - Input */}
+      <div className="w-1/2 bg-[#4b4b4b] text-white p-6">
+        <h2 className="text-xl font-semibold mb-4">Input</h2>
 
-      {/* Main Panel */}
-      <main className="flex-1 w-full flex flex-col gap-6">
-        {/* Code Box */}
-        <div className="rounded-2xl shadow-2xl overflow-hidden border border-gray-800 bg-gray-900 text-green-100 font-mono text-sm">
+        {/* Expand icons (fake placeholders as per screenshot) */}
+        <div className="space-y-4 mb-4">
+          <span className="block text-2xl">&gt;</span>
+          <span className="block text-2xl">&gt;</span>
+        </div>
+
+        {/* Editor */}
+        <div className="bg-[#2d2d2d] rounded-lg border border-gray-600 overflow-hidden">
           <div className="flex">
-            {/* Line numbers */}
-            <div className="bg-gray-800 text-right px-4 py-4 select-none text-gray-500">
+            <div className="bg-gray-800 text-right px-4 py-4 select-none text-gray-400">
               {lines.map((_, idx) => (
                 <div key={idx}>{idx + 1}</div>
               ))}
             </div>
-            {/* Textarea */}
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="w-full h-[400px] p-4 bg-transparent focus:outline-none resize-none overflow-auto"
+              className="w-full h-[400px] p-4 bg-transparent text-green-100 focus:outline-none resize-none overflow-auto"
               spellCheck="false"
             />
           </div>
         </div>
 
-        {/* Buttons */}
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex gap-4 mt-4">
           <button
             onClick={handleCompile}
             disabled={loading}
-            className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 rounded-xl shadow-lg transition disabled:opacity-50"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow"
           >
-            {loading ? 'Compiling...' : 'Run Code'}
-          </button>
-
-          <button
-            onClick={() => navigate('/CreateFile')}
-            className="self-start bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-8 py-3 rounded-xl shadow-lg transition disabled:opacity-50">
-
-            Create File
+            {loading ? 'Compiling...' : 'Run'}
           </button>
         </div>
+      </div>
 
-        {/* Output Panel */}
-        <div className="bg-white text-gray-800 rounded-2xl border border-gray-300 p-6 min-h-[100px] shadow-xl">
-          <h4 className="text-lg font-semibold mb-2">Output:</h4>
-          <div className="whitespace-pre-wrap text-sm">
-            {output || (error && `❌ ${error}`) || 'No output yet.'}
-          </div>
+      {/* Right - Output */}
+      <div className="w-1/2 bg-[#111111] text-white p-6">
+        <h2 className="text-xl font-semibold mb-4">Output</h2>
+        <div className="bg-black rounded-lg p-4 min-h-[300px] text-sm whitespace-pre-wrap">
+          {output || (error && `❌ ${error}`) || 'No output yet.'}
         </div>
-      </main>
+      </div>
     </div>
-  );
+  </div>
+);
+
 }
