@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Navbar from '../Navbar/Navbar';
 import { Outlet, useLocation } from 'react-router-dom';
 import CodeImage from '../../assets/codeImage.png';
+import gsap from 'gsap';
 
 export default function Layout() {
     const location = useLocation();
@@ -10,33 +11,43 @@ export default function Layout() {
     const isRegisterPage = location.pathname === '/register';
     const isCodePage = location.pathname === '/code';
 
+    const svgRef = useRef(null);
+    const imageRef = useRef(null);
+    const outletRef = useRef(null);
+
+    useEffect(() => {
+        if (!isCodePage) {
+            const tl = gsap.timeline();
+
+            tl.fromTo(
+                svgRef.current,
+                { y: -100, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1, ease: 'power3.out' }
+            )
+                .fromTo(
+                    imageRef.current,
+                    { x: 100, opacity: 0 },
+                    { x: 0, opacity: 1, duration: 1, ease: 'power3.out' },
+                    '-=0.7' // start slightly before SVG finishes
+                )
+                .fromTo(
+                    outletRef.current,
+                    { x: -100, opacity: 0 },
+                    { x: 0, opacity: 1, duration: 1, ease: 'power3.out' },
+                    '-=0.6'
+                );
+        }
+    }, [isCodePage]);
+
     return (
-        <div className='flex flex-col min-h-screen relative overflow-hidden'>
+        <div className="container">
             <Navbar />
-            <div className="flex flex-grow px-5 relative z-10">
-                <Outlet className='z-50' />
 
-                {/* Image on the Right (Only show if not on the "code" page) */}
-                {!isCodePage && (
-                    <div
-                        className={`flex justify-center absolute right-0 top-0 bottom-0 items-center transition-all duration-500 ease-in-out ${
-                            isLoginPage ? 'w-1/4' : isRegisterPage ? 'w-[40%]' : 'w-1/3'
-                        }`}
-                    >
-                        <img
-                            src={CodeImage}
-                            alt="Code"
-                            className="object-contain max-w-full h-auto z-10"
-                        />
-                    </div>
-                )}
-            </div>
-
-            {/* Full height SVG background - hidden on code page */}
             {!isCodePage && (
-                <div className="absolute inset-0 z-0">
+                <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
                     <svg
-                        className="h-full w-full object rounded-[20px]"
+                        ref={svgRef}
+                        className="h-full w-full object-cover"
                         viewBox="0 0 1357 1024"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -63,8 +74,29 @@ export default function Layout() {
                             </linearGradient>
                         </defs>
                     </svg>
+
+                    <div
+                        ref={imageRef}
+                        className={`flex justify-center absolute right-0 top-0 bottom-0 items-center transition-all duration-500 ease-in-out ${isLoginPage ? 'w-1/4' : isRegisterPage ? 'w-[40%]' : 'w-1/3'
+                            }`}
+                    >
+                        <img
+                            src={CodeImage}
+                            alt="Code"
+                            className="object-cover max-w-full h-auto z-10"
+                        />
+                    </div>
                 </div>
             )}
+
+            <div className="flex-grow relative z-20">
+                <div
+                    ref={outletRef}
+                    className="flex w-full justify-center items-center min-h-screen"
+                >
+                    <Outlet />
+                </div>
+            </div>
         </div>
     );
 }

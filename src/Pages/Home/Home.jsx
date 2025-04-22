@@ -14,14 +14,14 @@ export default function Home() {
   }, [])
 
   return (
-    <section id='home' className='flex items-center justify-center  px-6'>
-      <div className='py-20'>
+    <section id='home' className='xl:right-52 lg:right-6 '>
+      <div className="container">
         <div className='text gap-6 flex md:items-start flex-col'>
           <AnimatePresence mode="wait">
             {showFirst ? (
               <motion.h1
                 key="heading1"
-                className='text-white font-bold text-[2.7rem]'
+                className='text-white font-bold text-[3.5rem]'
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -32,7 +32,7 @@ export default function Home() {
             ) : (
               <motion.h1
                 key="heading2"
-                className='text-white font-bold text-[2.7rem]'
+                className='text-white font-bold text-[3.5rem]'
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
@@ -45,7 +45,7 @@ export default function Home() {
           </AnimatePresence>
 
           <motion.p
-            className='bg-gradient-to-r from-[#08AEED] to-[#09E190] bg-clip-text text-transparent text-[1rem]  font-semibold'
+            className='bg-gradient-to-r from-[#08AEED] to-[#09E190] bg-clip-text text-transparent text-[1.3rem]  font-semibold'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}

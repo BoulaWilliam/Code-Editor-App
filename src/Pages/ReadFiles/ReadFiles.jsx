@@ -35,13 +35,13 @@ export default function ReadFiles() {
 
     return (    
         <>
-        <div className='container flex items-center justify-center flex-grow'>
-        <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg">
-            <h2 className="text-2xl font-bold mb-6">All Files</h2>
+        <div className='container flex items-center mb-64 justify-center flex-grow '>
+        <div className="max-w-4xl mx-auto mt-10 p-6  rounded-xl bg-[#4B4B4B] shadow-[#292828] shadow-lg">
+            <h2 className="text-2xl font-bold mb-6 text-white">All Files</h2>
             {error && <div className="text-red-500 mb-4">❌ {error}</div>}
 
             {loading ? (
-                <div className="text-center">Loading...</div> // Loading indicator
+                <div className="text-center text-[#08AEED]">Loading...</div> // Loading indicator
             ) : (
                 <ul className="space-y-4">
                     {files.map((file) => (

@@ -37,26 +37,25 @@ export default function CreateFile() {
         }
     };
 
-    // Adjusted handleRead to work with query parameters
     const handleRead = async () => {
-        setLoading(true); // Start loading
+        setLoading(true);
         setError('');
         try {
             const { data } = await api.get(`/file`, {
-                params: { fileId }, // Sending fileId as query parameter
+                params: { fileId },
             });
-            setFileDetails(data); // Set the file details
+            setFileDetails(data);
             toast.success('File details fetched successfully!');
         } catch (err) {
-            setError(err.response?.data?.errorMessage || err.message); // Handle error
+            setError(err.response?.data?.errorMessage || err.message);
             toast.error(`Error: ${err.response?.data?.errorMessage || err.message}`);
         } finally {
-            setLoading(false); // Stop loading
+            setLoading(false);
         }
     };
 
     const handleUpdate = async () => {
-        setLoading(true); // Start loading
+        setLoading(true);
         try {
             const { data } = await api.patch('/file', {
                 fileId,
@@ -69,12 +68,12 @@ export default function CreateFile() {
             setError(err.response?.data?.errorMessage || err.message);
             toast.error(`Error: ${err.response?.data?.errorMessage || err.message}`);
         } finally {
-            setLoading(false); // Stop loading
+            setLoading(false);
         }
     };
 
     const handleDelete = async () => {
-        setLoading(true); // Start loading
+        setLoading(true);
         try {
             const { data } = await api.delete('/file', { data: { fileId } });
             if (data.isDeleted) {
@@ -89,12 +88,12 @@ export default function CreateFile() {
             setError(err.response?.data?.errorMessage || err.message);
             toast.error(`Error: ${err.response?.data?.errorMessage || err.message}`);
         } finally {
-            setLoading(false); // Stop loading
+            setLoading(false);
         }
     };
 
     const handleShare = async () => {
-        setLoading(true); // Start loading
+        setLoading(true);
         try {
             const { data } = await api.post('/share', { fileId });
             setShareCode(data.fileShareCode);
@@ -103,66 +102,74 @@ export default function CreateFile() {
             setError(err.response?.data?.errorMessage || err.message);
             toast.error(`Error: ${err.response?.data?.errorMessage || err.message}`);
         } finally {
-            setLoading(false); // Stop loading
+            setLoading(false);
         }
     };
 
     return (
-        <>
-            <div className='container flex items-center justify-center flex-grow'>
-                <div className="max-w-3xl mx-auto bg-white p-8 shadow-lg rounded-xl mt-10">
-                    <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">Create New File</h2>
-                    <div className="space-y-4">
-                        <input
-                            type="text"
-                            placeholder="File name"
-                            className="w-full p-3 border border-gray-300 rounded-md"
-                            value={fileName}
-                            onChange={(e) => setFileName(e.target.value)}
-                        />
-                        <textarea
-                            placeholder="File content"
-                            className="w-full p-3 border border-gray-300 rounded-md h-40"
-                            value={fileContent}
-                            onChange={(e) => setFileContent(e.target.value)}
-                        ></textarea>
-                        <button
-                            onClick={handleCreate}
-                            disabled={loading}
-                            className="w-full bg-blue-600 hover:bg-blue-700 transition text-white py-2 rounded-md font-semibold disabled:opacity-50"
-                        >
-                            {loading ? 'Creating...' : 'Create File'}
-                        </button>
+        <div className='container mb-52 flex items-center justify-center flex-grow'>
+            <div className="max-w-3xl mx-auto bg-[#4B4B4B] p-8 shadow-lg shadow-[#292828] rounded-xl mt-10">
+                <h2 className="text-3xl font-bold mb-6 text-center text-white">Create New File</h2>
+                <div className="space-y-4">
+                    <input
+                        type="text"
+                        placeholder="File name"
+                        className="w-full p-3 border border-gray-300 rounded-md"
+                        value={fileName}
+                        onChange={(e) => setFileName(e.target.value)}
+                    />
+                    <textarea
+                        placeholder="File content"
+                        className="w-full p-3 border border-gray-300 rounded-md h-40"
+                        value={fileContent}
+                        onChange={(e) => setFileContent(e.target.value)}
+                    ></textarea>
+                    <button
+                        onClick={handleCreate}
+                        disabled={loading}
+                        className="w-full bg-gradient-to-r from-[#08AEED] to-[#09E190] transition text-white py-2 rounded-md font-semibold disabled:opacity-50"
+                    >
+                        {loading ? 'Creating...' : 'Create File'}
+                    </button>
 
-                        {error && <p className="text-red-600 font-medium">❌ {error}</p>}
+                    {error && <p className="text-red-600 font-medium">❌ {error}</p>}
 
-                        {fileId && (
-                            <div className="mt-8">
-                                <h3 className="text-xl font-semibold mb-4">File Options</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <button onClick={handleRead} className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md">🔍 Read</button>
-                                    <button onClick={handleUpdate} className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-md">✏️ Update</button>
-                                    <button onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white py-2 rounded-md">🗑️ Delete</button>
-                                    <button onClick={handleShare} className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md">🔗 Share</button>
-                                </div>
+                    {fileId && (
+                        <div className="mt-8">
+                            <h3 className="text-xl font-semibold mb-4 text-white">File Options</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <button onClick={handleRead} className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md">🔍 Read</button>
+                                <button onClick={handleUpdate} className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-md">✏️ Update</button>
+                                <button onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white py-2 rounded-md">🗑️ Delete</button>
+                                <button onClick={handleShare} className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md">🔗 Share</button>
                             </div>
-                        )}
+                        </div>
+                    )}
 
-                        {fileDetails && (
-                            <div className="mt-6 bg-gray-100 p-4 rounded-md">
-                                <h4 className="text-lg font-semibold mb-2">📄 File Details</h4>
-                                <pre className="text-sm whitespace-pre-wrap break-words">{JSON.stringify(fileDetails, null, 2)}</pre>
-                            </div>
-                        )}
+                    {fileDetails && (
+                        <div className="mt-6 bg-gray-100 p-4 rounded-md">
+                            <h4 className="text-lg font-semibold mb-2">📄 File Details</h4>
+                            <pre className="text-sm whitespace-pre-wrap break-words">
+                                {JSON.stringify(
+                                    Object.fromEntries(
+                                        Object.entries(fileDetails).filter(
+                                            ([key]) => key !== 'statusCode' && key !== 'fileSize'
+                                        )
+                                    ),
+                                    null,
+                                    2
+                                )}
+                            </pre>
+                        </div>
+                    )}
 
-                        {shareCode && (
-                            <div className="mt-4 bg-blue-100 p-4 rounded-md text-blue-700 font-semibold">
-                                🔗 Share Code: {shareCode}
-                            </div>
-                        )}
-                    </div>
+                    {shareCode && (
+                        <div className="mt-4 bg-blue-100 p-4 rounded-md text-blue-700 font-semibold">
+                            🔗 Share Code: {shareCode}
+                        </div>
+                    )}
                 </div>
             </div>
-        </>
+        </div>
     );
 }

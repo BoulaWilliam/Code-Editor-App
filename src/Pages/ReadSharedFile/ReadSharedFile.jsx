@@ -24,19 +24,19 @@ export default function ReadSharedFile() {
 
     return (
         <>
-        <div className='container flex items-center justify-center flex-grow'>
-        <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg">
-            <h2 className="text-2xl font-bold mb-6">Read Shared File</h2>
+        <div className='container flex items-center justify-center mb-52 flex-grow'>
+        <div className="max-w-3xl  mx-auto mt-10 p-6 bg-[#4B4B4B] shadow-[#292828] rounded-xl shadow-lg">
+            <h2 className="text-2xl font-bold my-4 text-white">Read Shared File</h2>
             <input
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="Enter Share Code"
-                className="w-full p-3 border mb-4 rounded"
+                placeholder="   Enter Share Link "
+                className="w-full p-2 border my-4 rounded-[12px]"
             />
             <button
                 onClick={handleRead}
-                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+                className="bg-gradient-to-r from-[#08AEED] to-[#09E190] text-white px-12 py-2 my-4 rounded-[10px]"
             >
                 Fetch File
             </button>
