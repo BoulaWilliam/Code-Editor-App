@@ -14,7 +14,7 @@ export default function Home() {
   }, [])
 
   return (
-    <section id='home' className='xl:right-52 lg:right-6 '>
+    <section id='home' className='xl:right-52 lg:right-6 mt-28'>
       <div className="container">
         <div className='text gap-6 flex md:items-start flex-col'>
           <AnimatePresence mode="wait">

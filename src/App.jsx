@@ -4,6 +4,7 @@ import {
   RouterProvider,
   Navigate,
 } from 'react-router-dom';
+
 import CodeEditor from './Pages/CodeEditor/CodeEditor';
 import Layout from './Components/Layout/Layout';
 import Login from './Pages/Login/Login';
@@ -18,33 +19,8 @@ import GuestRoute from './Components/GuestRoute/GuestRoute';
 import NotFound from './Components/NotFound/NotFound';
 import Home from './Pages/Home/Home';
 import Chatbot from './Pages/Chatbot/Chatbot';
-
-// 🔐 Protected Routes
-const protectedRoutes = [
-  { path: 'code', element: <CodeEditor /> },
-  { path: 'bot', element: <Chatbot /> },
-  { path: 'CreateFile', element: <CreateFile /> },
-  { path: 'ReadFiles', element: <ReadFiles /> },
-].map(route => ({
-  ...route,
-  element: <ProtectedRoute>{route.element}</ProtectedRoute>,
-}));
-
-// 🧑‍💻 Guest Routes
-const guestRoutes = [
-  { path: 'home', element: <Home /> },
-  { path: 'login', element: <Login /> },
-  { path: 'register', element: <Register /> },
-].map(route => ({
-  ...route,
-  element: <GuestRoute>{route.element}</GuestRoute>,
-}));
-
-// Public + NotFound
-const otherRoutes = [
-  { path: 'ReadShared', element: <ReadSharedFile /> },
-  { path: '*', element: <NotFound /> },
-];
+import ForgetPassword from './Pages/ForgetPassword/ForgetPassword'; // ✅ Add this import
+import ResetPassword from './Pages/ResetPassword/ResetPassword';
 
 const router = createBrowserRouter(
   [
@@ -53,14 +29,94 @@ const router = createBrowserRouter(
       element: <Layout />,
       children: [
         { index: true, element: <Navigate to="/home" replace /> },
-        ...protectedRoutes,
-        ...guestRoutes,
-        ...otherRoutes,
+
+        // 🔐 Protected Routes
+        {
+          path: 'code',
+          element: (
+            <ProtectedRoute>
+              <CodeEditor />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'bot',
+          element: (
+            <ProtectedRoute>
+              <Chatbot />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'CreateFile',
+          element: (
+            <ProtectedRoute>
+              <CreateFile />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'ReadFiles',
+          element: (
+            <ProtectedRoute>
+              <ReadFiles />
+            </ProtectedRoute>
+          ),
+        },
+
+        // 🧑‍💻 Home Route (accessible to all)
+        {
+          path: 'home',
+          element: <Home />,
+        },
+
+        // 🧑‍💻 Guest Routes
+        {
+          path: 'login',
+          element: (
+            <GuestRoute>
+              <Login />
+            </GuestRoute>
+          ),
+        },
+        {
+          path: 'register',
+          element: (
+            <GuestRoute>
+              <Register />
+            </GuestRoute>
+          ),
+        },
+        {
+          path: 'forgetPassword', 
+          element: (
+            <GuestRoute>
+              <ForgetPassword />
+            </GuestRoute>
+          ),
+          
+        }
+        ,
+        {
+          path: 'resetPassword', 
+          element: (
+            <GuestRoute>
+              <ResetPassword />
+            </GuestRoute>
+          ),
+          
+        },
+
+        // 📁 Public Route
+        { path: 'ReadShared', element: <ReadSharedFile /> },
+
+        // ❌ Not Found
+        { path: '*', element: <NotFound /> },
       ],
     },
   ],
   {
-    basename: '/Code-Editor-App',
+    basename: '/Code-Editor-App', // ✅ works for GitHub Pages or subdirectory deployments
   }
 );
 

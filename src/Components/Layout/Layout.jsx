@@ -92,7 +92,7 @@ export default function Layout() {
             <div className="flex-grow relative z-20">
                 <div
                     ref={outletRef}
-                    className="flex w-full justify-center items-center min-h-screen"
+                    className="flex w-full justify-center items-center  "
                 >
                     <Outlet />
                 </div>
