@@ -10,7 +10,8 @@ export default function ResetPassword() {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const username = location.state?.username || ""; // ✅ Get username passed from ForgetPassword
+    // ✅ Get username passed from ForgetPassword
+    const username = location.state?.username || ""; 
 
     async function handleUpdatePassword(e) {
         e.preventDefault();
@@ -33,7 +34,7 @@ export default function ResetPassword() {
                 }
             );
 
-            console.log("Reset password response:", response.data); // 🖨️ Print the response
+            console.log("Reset password response:", response.data); 
 
             if (response.data.statusCode === 200) {
                 toast.success("Password reset successfully!");

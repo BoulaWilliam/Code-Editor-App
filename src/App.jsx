@@ -32,6 +32,14 @@ const router = createBrowserRouter(
 
         // 🔐 Protected Routes
         {
+          path: 'code/:fileId',
+          element: (
+            <ProtectedRoute>
+              <CodeEditor />
+            </ProtectedRoute>
+          ),
+        },
+        {
           path: 'code',
           element: (
             <ProtectedRoute>

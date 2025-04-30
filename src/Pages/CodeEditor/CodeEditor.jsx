@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
+import { useParams } from "react-router-dom";
 import { userContext } from "../../Contexts/UserContext/User.context";
 import { motion } from "framer-motion";
 import gsap from "gsap";
@@ -7,10 +8,14 @@ import { Play } from "lucide-react";
 
 export default function CodeEditor() {
   const { token } = useContext(userContext);
+  const { fileId } = useParams(); // NEW - for fileId in URL
+
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(""); // NEW - for error handling
+
   const svgRef = useRef(null);
   const inputLineRef = useRef(null);
   const inputTextRef = useRef(null);
@@ -29,9 +34,38 @@ export default function CodeEditor() {
     csharp: `using System;\n\nclass Program {\n  static void Main() {\n    Console.WriteLine("Hello, C#!");\n  }\n}`
   };
 
+  // Load default snippet or file content
   useEffect(() => {
-    setCode(defaultSnippets[language] || "");
-  }, [language]);
+    if (!fileId) {
+      setCode(defaultSnippets[language] || "");
+    }
+  }, [language, fileId]);
+
+  // Fetch file by fileId from GradAPI
+  useEffect(() => {
+    if (!fileId || !token) return;
+
+    const fetchFile = async () => {
+      try {
+        const response = await fetch(`https://gradapi.duckdns.org/file?fileId=${fileId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.errorMessage || "Failed to load file.");
+        }
+
+        setCode(data.fileContent);
+        // Optionally set language if you store language with file
+        // setLanguage(data.language || 'javascript');
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    fetchFile();
+  }, [fileId, token]);
 
   useEffect(() => {
     if (svgRef.current) {
@@ -74,9 +108,13 @@ export default function CodeEditor() {
     }
   };
 
+  if (error) {
+    return <div className="text-red-500 p-6">Error: {error}</div>;
+  }
+
   return (
     <section className="code">
-      <div className="w-screen h-screen bg-[#444444] text-white flex mb-12 flex-col">
+      <div className="w-screen h-screen bg-[#444444] text-white flex flex-col">
         <div className="w-screen h-screen bg-[#444444] text-white flex flex-col px-4">
           <motion.div
             className="flex flex-1 overflow-hidden flex-col lg:flex-row"

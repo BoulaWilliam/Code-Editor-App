@@ -1,71 +1,203 @@
-import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
-import { userContext } from "../../Contexts/UserContext/User.context";
+
+import React, { useContext, useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { FileText, Eye, Pencil, Trash2, Share2, ArrowRight } from 'lucide-react';
+import { userContext } from '../../Contexts/UserContext/User.context';
+import toast from 'react-hot-toast';
 
 export default function ReadFiles() {
-  const { token } = useContext(userContext);
-  //   const token =
-  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoibW9kaSIsInN1YiI6Im1vZGkiLCJ1c2VybmFtZSI6Im1vZGkiLCJqdGkiOiJiNTk4YzQ5OS0zMDQ3LTQyZjAtYjcxMC1mMDIwN2FlYTljYjgiLCJleHAiOjE3NDU2OTM0NTcsImlzcyI6Im1lIn0.trm49o_q4lOk_H3QU1Us0nwzQo98Oez7tne9DL_jMCU";
+    const { token } = useContext(userContext);
+    const [files, setFiles] = useState([]);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [editMode, setEditMode] = useState(false);
+    const [shareCode, setShareCode] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
-  const [files, setFiles] = useState([]);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const fetchFiles = async () => {
-    setLoading(true); // Start loading
-    setError(""); // Clear any previous errors
-    try {
-      // Sending the GET request with the correct headers and no body
-      const res = await axios.get("https://gradapi.duckdns.org/file/all", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // If the response is successful, set the files
-      return res.data.files;
-    } catch (err) {
-      // Handle errors (both network and API-related)
-      setError(
-        err.response?.data?.errorMessage || "Unexpected error: " + err.message
-      );
-    } finally {
-      setLoading(false); // Stop loading once the request is complete
-    }
-  };
-
-  useEffect(() => {
-    fetchFiles().then((files) => {
-      setFiles(files);
+    const api = axios.create({
+        baseURL: 'https://gradapi.duckdns.org',
+        headers: { Authorization: `Bearer ${token}` },
     });
-  }, [token]);
 
-  return (
-    <>
-      <div className="container flex items-center mb-64 justify-center flex-grow ">
-        <div className="max-w-4xl mx-auto mt-10 p-6  rounded-xl bg-[#4B4B4B] shadow-[#292828] shadow-lg">
-          <h2 className="text-2xl font-bold mb-6 text-white">All Files</h2>
-          {error && <div className="text-red-500 mb-4">❌ {error}</div>}
+    useEffect(() => {
+        fetchFiles();
+    }, [token]);
 
-          {loading ? (
-            <div className="text-center text-[#08AEED]">Loading...</div> // Loading indicator
-          ) : (
-            <ul className="space-y-4">
-              {files.map((file) => (
-                <li
-                  key={file.fileId}
-                  className="p-4 bg-gray-100 rounded shadow"
+    const fetchFiles = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get('/file/all');
+            setFiles(res.data.files);
+        } catch (err) {
+            setError(err.response?.data?.errorMessage || err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRead = async (fileId) => {
+        try {
+            const res = await api.get('/file', { params: { fileId } });
+            setSelectedFile({ ...res.data, fileId });
+            setEditMode(false);
+        } catch (err) {
+            toast.error(err.response?.data?.errorMessage || 'Failed to read file');
+        }
+    };
+
+    const handleUpdate = async () => {
+        try {
+            const { fileId, fileName, fileContent } = selectedFile;
+            await api.patch('/file', {
+                fileId,
+                newFileName: fileName,
+                newFileContent: fileContent,
+            });
+            toast.success('File updated successfully');
+            setSelectedFile(null);
+            fetchFiles();
+        } catch (err) {
+            toast.error(err.response?.data?.errorMessage || 'Failed to update file');
+        }
+    };
+
+    const handleDelete = async (fileId) => {
+        try {
+            await api.delete('/file', { data: { fileId } });
+            toast.success('File deleted successfully');
+            setSelectedFile(null);
+            fetchFiles();
+        } catch (err) {
+            toast.error(err.response?.data?.errorMessage || 'Failed to delete file');
+        }
+    };
+
+    const handleShare = async (fileId) => {
+        try {
+            const res = await api.post('/share', { fileId });
+            setShareCode(res.data.fileShareCode);
+            toast.success('File shared!');
+        } catch (err) {
+            toast.error(err.response?.data?.errorMessage || 'Failed to share file');
+        }
+    };
+
+    const renderFileDetails = () => (
+        <div className="bg-gray-800 text-white p-6 mt-6 rounded-lg shadow-lg">
+            <h3 className="text-2xl font-semibold mb-4">📄 File Details</h3>
+            <input
+                className="w-full p-2 mb-2 bg-gray-700 rounded-md"
+                value={selectedFile.fileName}
+                onChange={(e) => setSelectedFile({ ...selectedFile, fileName: e.target.value })}
+                disabled={!editMode}
+            />
+            <textarea
+                className="w-full h-40 p-2 bg-gray-700 rounded-md"
+                value={selectedFile.fileContent}
+                onChange={(e) => setSelectedFile({ ...selectedFile, fileContent: e.target.value })}
+                disabled={!editMode}
+            />
+            <div className="mt-4 flex gap-4 flex-wrap">
+                {editMode ? (
+                    <button
+                        onClick={handleUpdate}
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                    >
+                        💾 Save Changes
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => setEditMode(true)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
+                    >
+                        ✏️ Edit
+                    </button>
+                )}
+                <button
+                    onClick={() => setSelectedFile(null)}
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
                 >
-                  <div className="font-semibold">{file.fileName}</div>
-                  <div className="text-sm text-gray-600">
-                    Size: {(file.fileSizeInBytes / 1024).toFixed(2)} KB
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+                    ❌ Close
+                </button>
+            </div>
         </div>
-      </div>
-    </>
-  );
+    );
+
+    return (
+        <div className="w-screen min-h-screen text-white px-4 py-10 overflow-auto">
+            <div className="max-w-7xl mx-auto">
+                <h2 className="text-3xl font-extrabold text-white mb-12 mt-[50px] text-center">
+                    All Files
+                </h2>
+
+                {error && <div className="text-red-400 text-center mb-6">❌ {error}</div>}
+
+                {loading ? (
+                    <div className="text-center text-[#08AEED] text-lg font-semibold">Loading...</div>
+                ) : (
+                    <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                        {files.map((file) => (
+                            <div
+                                key={file.fileId}
+                                className="relative aspect-square bg-white/90 rounded-2xl p-6 flex flex-col justify-between items-center text-gray-800 shadow-md hover:shadow-2xl hover:shadow-[#08AEED] transition-transform"
+                            >
+                                <FileText size={48} className="text-[#08AEED] mb-2" />
+                                <div className="text-center text-base font-semibold truncate w-full">
+                                    {file.fileName}
+                                </div>
+                                <div className="text-sm text-gray-600 mt-1">
+                                    {(file.fileSizeInBytes / 1024).toFixed(2)} KB
+                                </div>
+                                <div className="flex justify-center gap-2 mt-4 flex-wrap">
+                                    <button
+                                        onClick={() => handleRead(file.fileId)}
+                                        className="bg-blue-100 p-2 rounded"
+                                    >
+                                        <Eye size={18} className="text-blue-600" />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            handleRead(file.fileId);
+                                            setEditMode(true);
+                                        }}
+                                        className="bg-yellow-100 p-2 rounded"
+                                    >
+                                        <Pencil size={18} className="text-yellow-600" />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(file.fileId)}
+                                        className="bg-red-100 p-2 rounded"
+                                    >
+                                        <Trash2 size={18} className="text-red-600" />
+                                    </button>
+                                    <button
+                                        onClick={() => handleShare(file.fileId)}
+                                        className="bg-indigo-100 p-2 rounded"
+                                    >
+                                        <Share2 size={18} className="text-indigo-600" />
+                                    </button>
+                                    <button
+                                        onClick={() => navigate(`/code/${file.fileId}`)}
+                                        className="bg-green-100 p-2 rounded"
+                                    >
+                                        <ArrowRight size={18} className="text-green-600" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {selectedFile && renderFileDetails()}
+
+                {shareCode && (
+                    <div className="mt-6 text-center text-blue-400 font-semibold">
+                        🔗 Share Code: {shareCode}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 }
