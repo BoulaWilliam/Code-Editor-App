@@ -8,13 +8,13 @@ import { Play } from "lucide-react";
 
 export default function CodeEditor() {
   const { token } = useContext(userContext);
-  const { fileId } = useParams(); // NEW - for fileId in URL
+  const { fileId } = useParams();
 
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(""); // NEW - for error handling
+  const [error, setError] = useState("");
 
   const svgRef = useRef(null);
   const inputLineRef = useRef(null);
@@ -24,24 +24,24 @@ export default function CodeEditor() {
     { name: "JavaScript", value: "javascript" },
     { name: "Python", value: "python" },
     { name: "C++", value: "cpp" },
-    { name: "C#", value: "csharp" }
+    { name: "C#", value: "csharp" },
+    { name: "Java", value: "java" }, // Added Java
   ];
 
   const defaultSnippets = {
     javascript: `console.log("Hello, JavaScript!");`,
     python: `print("Hello, Python!")`,
     cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, C++!" << endl;\n  return 0;\n}`,
-    csharp: `using System;\n\nclass Program {\n  static void Main() {\n    Console.WriteLine("Hello, C#!");\n  }\n}`
+    csharp: `using System;\n\nclass Program {\n  static void Main() {\n    Console.WriteLine("Hello, C#!");\n  }\n}`,
+    java: `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, Java!");\n  }\n}`, // Java snippet
   };
 
-  // Load default snippet or file content
   useEffect(() => {
     if (!fileId) {
       setCode(defaultSnippets[language] || "");
     }
   }, [language, fileId]);
 
-  // Fetch file by fileId from GradAPI
   useEffect(() => {
     if (!fileId || !token) return;
 
@@ -57,7 +57,7 @@ export default function CodeEditor() {
         }
 
         setCode(data.fileContent);
-        // Optionally set language if you store language with file
+        // Optionally set language from data
         // setLanguage(data.language || 'javascript');
       } catch (err) {
         setError(err.message);
