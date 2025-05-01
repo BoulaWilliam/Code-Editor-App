@@ -1,38 +1,38 @@
-import './App.css';
+import "./App.css";
 import {
   createBrowserRouter,
   RouterProvider,
   Navigate,
-} from 'react-router-dom';
+} from "react-router-dom";
 
-import CodeEditor from './Pages/CodeEditor/CodeEditor';
-import Layout from './Components/Layout/Layout';
-import Login from './Pages/Login/Login';
-import Register from './Pages/Register/Register';
-import UserProvider from './Contexts/UserContext/User.context';
-import CreateFile from './Pages/CreateFile/CreateFile';
-import ReadFiles from './Pages/ReadFiles/ReadFiles';
-import ReadSharedFile from './Pages/ReadSharedFile/ReadSharedFile';
-import { Toaster } from 'react-hot-toast';
-import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute';
-import GuestRoute from './Components/GuestRoute/GuestRoute';
-import NotFound from './Components/NotFound/NotFound';
-import Home from './Pages/Home/Home';
-import Chatbot from './Pages/Chatbot/Chatbot';
-import ForgetPassword from './Pages/ForgetPassword/ForgetPassword'; // ✅ Add this import
-import ResetPassword from './Pages/ResetPassword/ResetPassword';
+import CodeEditor from "./Pages/CodeEditor/CodeEditor";
+import Layout from "./Components/Layout/Layout";
+import Login from "./Pages/Login/Login";
+import Register from "./Pages/Register/Register";
+import UserProvider from "./Contexts/UserContext/User.context";
+import CreateFile from "./Pages/CreateFile/CreateFile";
+import ReadFiles from "./Pages/ReadFiles/ReadFiles";
+import ReadSharedFile from "./Pages/ReadSharedFile/ReadSharedFile";
+import { Toaster } from "react-hot-toast";
+import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute";
+import GuestRoute from "./Components/GuestRoute/GuestRoute";
+import NotFound from "./Components/NotFound/NotFound";
+import Home from "./Pages/Home/Home";
+import Chatbot from "./Pages/Chatbot/Chatbot";
+import ForgetPassword from "./Pages/ForgetPassword/ForgetPassword"; // ✅ Add this import
+import ResetPassword from "./Pages/ResetPassword/ResetPassword";
 
 const router = createBrowserRouter(
   [
     {
-      path: '/',
+      path: "/",
       element: <Layout />,
       children: [
         { index: true, element: <Navigate to="/home" replace /> },
 
         // 🔐 Protected Routes
         {
-          path: 'code/:fileId',
+          path: "code/:fileId",
           element: (
             <ProtectedRoute>
               <CodeEditor />
@@ -40,7 +40,7 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: 'code',
+          path: "code",
           element: (
             <ProtectedRoute>
               <CodeEditor />
@@ -48,7 +48,7 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: 'bot',
+          path: "bot",
           element: (
             <ProtectedRoute>
               <Chatbot />
@@ -56,7 +56,7 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: 'CreateFile',
+          path: "CreateFile",
           element: (
             <ProtectedRoute>
               <CreateFile />
@@ -64,7 +64,7 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: 'ReadFiles',
+          path: "ReadFiles",
           element: (
             <ProtectedRoute>
               <ReadFiles />
@@ -74,13 +74,13 @@ const router = createBrowserRouter(
 
         // 🧑‍💻 Home Route (accessible to all)
         {
-          path: 'home',
+          path: "home",
           element: <Home />,
         },
 
         // 🧑‍💻 Guest Routes
         {
-          path: 'login',
+          path: "login",
           element: (
             <GuestRoute>
               <Login />
@@ -88,7 +88,7 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: 'register',
+          path: "register",
           element: (
             <GuestRoute>
               <Register />
@@ -96,35 +96,32 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: 'forgetPassword', 
+          path: "forgetPassword",
           element: (
             <GuestRoute>
               <ForgetPassword />
             </GuestRoute>
           ),
-          
-        }
-        ,
+        },
         {
-          path: 'resetPassword', 
+          path: "resetPassword",
           element: (
             <GuestRoute>
               <ResetPassword />
             </GuestRoute>
           ),
-          
         },
 
         // 📁 Public Route
-        { path: 'ReadShared', element: <ReadSharedFile /> },
+        { path: "ReadShared", element: <ReadSharedFile /> },
 
         // ❌ Not Found
-        { path: '*', element: <NotFound /> },
+        { path: "*", element: <NotFound /> },
       ],
     },
   ],
   {
-    basename: '/Code-Editor-App', // ✅ works for GitHub Pages or subdirectory deployments
+    basename: "/", // ✅ works for GitHub Pages or subdirectory deployments
   }
 );
 
