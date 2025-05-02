@@ -5,8 +5,6 @@ import { useContext } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, NavLink } from "react-router-dom";
 import { userContext } from "../../Contexts/UserContext/User.context";
-// Google Image
-import Google from '../../assets/Google.png'
 
 export default function Login() {
     const navigate = useNavigate();
@@ -124,21 +122,6 @@ export default function Login() {
                             <span className="mx-2 text-white text-md">OR</span>
                             <hr className="flex-grow border-white" />
                         </div>
-
-                        {/* Sign in with Google */}
-                        <div className="flex justify-center">
-                            <button
-                                type="button"
-                                className="w-10 h-10 flex items-center justify-center  rounded hover:scale-125 transition-all duration-200 "
-                            >
-                                <img
-                                    src={Google}
-                                    alt="Sign in with Google"
-                                    className="w-[40px]  object-cover"
-                                />
-                            </button>
-                        </div>
-
 
 
                         {/* Don't have account */}
