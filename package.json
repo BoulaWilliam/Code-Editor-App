@@ -2,7 +2,7 @@
   "name": "app",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://BoulaWilliam.github.io/Code-Editor-App.git",
+  "homepage": "https://boulawilliam.github.io/Code-Editor-App",
   "type": "module",
   "scripts": {
     "dev": "vite",
