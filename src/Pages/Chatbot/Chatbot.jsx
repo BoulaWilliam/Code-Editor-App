@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 
 export default function Chatbot() {
@@ -7,6 +7,7 @@ export default function Chatbot() {
     const [message, setMessage] = useState('');
     const [response, setResponse] = useState('');
     const [loading, setLoading] = useState(false);
+    const textareaRef = useRef(null);
 
     useEffect(() => {
         fetch('https://gradapi.duckdns.org/ai/models')
@@ -16,6 +17,7 @@ export default function Chatbot() {
     }, []);
 
     const handleSend = async () => {
+        if (!message.trim()) return;
         setLoading(true);
         try {
             const res = await fetch('https://gradapi.duckdns.org/ai', {
@@ -35,6 +37,14 @@ export default function Chatbot() {
     const copyToClipboard = (text) => {
         navigator.clipboard.writeText(text);
         toast.success('Code copied to clipboard!');
+    };
+
+    const handleTextareaInput = () => {
+        const el = textareaRef.current;
+        if (el) {
+            el.style.height = 'auto';
+            el.style.height = `${el.scrollHeight}px`;
+        }
     };
 
     const renderResponse = (text) => {
@@ -62,7 +72,7 @@ export default function Chatbot() {
     };
 
     return (
-        <div className="container flex items-center justify-center flex-grow mb-60 px-4">
+        <div className="container flex items-center justify-center flex-grow mt-40 px-4">
             <div className="bg-[#4B4B4B] rounded-lg shadow-lg shadow-[#292828] p-8 w-full max-w-4xl text-gray-200">
                 <h1 className="text-4xl font-bold text-center mb-6 text-white">
                     What Can I Help With?
@@ -71,7 +81,7 @@ export default function Chatbot() {
                 <div className="space-y-4">
                     <div className="relative">
                         <select
-                            className="w-full bg-[#08AEED]  text-white p-3 rounded"
+                            className="w-full bg-[#08AEED] text-white p-3 rounded"
                             value={selectedModel}
                             onChange={e => setSelectedModel(e.target.value)}
                         >
@@ -83,12 +93,17 @@ export default function Chatbot() {
                     </div>
 
                     <div className="relative">
-                        <input
-                            type="text"
-                            className="w-full pl-4 pr-12 text-black placeholder-gray-400 p-3 rounded"
+                        <textarea
+                            ref={textareaRef}
+                            rows={1}
+                            className="w-full pl-4 pr-12 text-black placeholder-gray-400 p-3 rounded resize-none overflow-hidden"
                             placeholder="Ask anything"
                             value={message}
-                            onChange={e => setMessage(e.target.value)}
+                            onChange={e => {
+                                setMessage(e.target.value);
+                                handleTextareaInput();
+                            }}
+                            onInput={handleTextareaInput}
                         />
                         <button
                             onClick={handleSend}
