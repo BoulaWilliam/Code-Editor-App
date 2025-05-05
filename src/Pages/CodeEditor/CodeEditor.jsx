@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import gsap from "gsap";
 import Logo from "../../assets/Logo.png";
 import { Play, Save } from "lucide-react";
+import toast from "react-hot-toast";
+
 import Editor from "@monaco-editor/react";
 
 export default function CodeEditor() {
@@ -121,6 +123,7 @@ export default function CodeEditor() {
       const data = await response.json();
       if (response.ok) setOutput(data.output);
       else setOutput(`❌ ${data.errorMessage}`);
+      toast.success("File Save Successfuly!");
     } catch (err) {
       setOutput("❌ Unexpected error: " + err.message);
     } finally {
@@ -144,9 +147,10 @@ export default function CodeEditor() {
         }),
       });
       const data = await response.json();
+      toast.success("File Save Successfuly!");
       if (!response.ok) throw new Error(data.errorMessage || "Save failed.");
     } catch (err) {
-      alert("❌ Save failed: " + err.message);
+      toast.error("❌ Save failed: " + err.message);
     } finally {
       setSaving(false);
     }
@@ -170,7 +174,7 @@ export default function CodeEditor() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.errorMessage || "Save failed.");
     } catch (err) {
-      alert("❌ Save failed: " + err.message);
+      toast.error("❌ Save failed: " + err.message);
     } finally {
       setSaving(false);
     }
