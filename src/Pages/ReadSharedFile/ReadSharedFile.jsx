@@ -34,7 +34,7 @@ export default function ReadSharedFile() {
                 newFileName: newFileName || null,
                 newFileContent: newFileContent || null,
             });
-            setFileData(data);
+            setFileData(data)
             setUpdateSuccess(true);
         } catch (err) {
             setError(err.response?.data?.errorMessage || err.message);
