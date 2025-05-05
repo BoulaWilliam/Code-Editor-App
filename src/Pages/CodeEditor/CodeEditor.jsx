@@ -123,7 +123,6 @@ export default function CodeEditor() {
       const data = await response.json();
       if (response.ok) setOutput(data.output);
       else setOutput(`❌ ${data.errorMessage}`);
-      toast.success("File Save Successfuly!");
     } catch (err) {
       setOutput("❌ Unexpected error: " + err.message);
     } finally {
