@@ -4,7 +4,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate, NavLink } from "react-router-dom";
 
-
 export default function Register() {
     const navigate = useNavigate();
 
@@ -12,7 +11,8 @@ export default function Register() {
         username: string()
             .required("Username is Required")
             .min(3, "Username Must Be At Least 3 Chars!")
-            .max(25, "Username Can't Be More Than 25 Chars!"),
+            .max(25, "Username Can't Be More Than 25 Chars!")
+            .matches(/^[a-zA-Z0-9][a-zA-Z0-9_ ]*$/, "Username must not start with special characters or spaces"),
         email: string()
             .required("Email is Required!")
             .email("Must be a valid email!"),
@@ -28,29 +28,20 @@ export default function Register() {
                 email: values.email,
                 password: values.password,
             });
-    
+
             if (data.statusCode === 200) {
                 toast.success("User Created Successfully!");
                 setTimeout(() => navigate("/login"), 2000);
             } else {
-                if (data.errorMessage?.toLowerCase().includes("email")) {
-                    toast.error("Email already exists.");
-                } else {
-                    toast.error(data.errorMessage || "Registration failed.");
-                }
+                toast.error(data.errorMessage || "Registration failed.");
             }
         } catch (error) {
             const msg = error.response?.data?.errorMessage;
-            if (msg?.toLowerCase().includes("email")) {
-                toast.error("Email already exists.");
-            } else {
-                toast.error("Network error. Please try again.");
-            }
+            toast.error(msg || "Network error. Please try again.");
         } finally {
             toast.dismiss(loadingToastId);
         }
     }
-    
 
     const formik = useFormik({
         initialValues: {
@@ -122,7 +113,10 @@ export default function Register() {
                             className="mr-2 accent-[#08AEED]"
                         />
                         <label htmlFor="terms">
-                            I agree to the <span className="text-[#09E190] hover:underline cursor-pointer">terms and conditions</span>
+                            I agree to the{" "}
+                            <span className="text-[#09E190] hover:underline cursor-pointer">
+                                terms and conditions
+                            </span>
                         </label>
                     </div>
                     {formik.touched.terms && formik.errors.terms && (
@@ -137,7 +131,6 @@ export default function Register() {
                     >
                         <i className="fas fa-user-plus mr-2"></i> Sign Up
                     </button>
-
 
                     {/* Already Have Account */}
                     <NavLink

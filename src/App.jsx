@@ -1,9 +1,5 @@
 import "./App.css";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Navigate,
-} from "react-router-dom";
+import { createHashRouter, RouterProvider, Navigate } from "react-router-dom";
 
 import CodeEditor from "./Pages/CodeEditor/CodeEditor";
 import Layout from "./Components/Layout/Layout";
@@ -19,111 +15,107 @@ import GuestRoute from "./Components/GuestRoute/GuestRoute";
 import NotFound from "./Components/NotFound/NotFound";
 import Home from "./Pages/Home/Home";
 import Chatbot from "./Pages/Chatbot/Chatbot";
-import ForgetPassword from "./Pages/ForgetPassword/ForgetPassword"; // ✅ Add this import
+import ForgetPassword from "./Pages/ForgetPassword/ForgetPassword";
 import ResetPassword from "./Pages/ResetPassword/ResetPassword";
 
-const router = createBrowserRouter(
-  [
-    {
-      path: "/",
-      element: <Layout />,
-      children: [
-        { index: true, element: <Navigate to="/home" replace /> },
-
-        // 🔐 Protected Routes
-        {
-          path: "code/:fileId",
-          element: (
-            <ProtectedRoute>
-              <CodeEditor />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "code",
-          element: (
-            <ProtectedRoute>
-              <CodeEditor />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "bot",
-          element: (
-            <ProtectedRoute>
-              <Chatbot />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "CreateFile",
-          element: (
-            <ProtectedRoute>
-              <CreateFile />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "ReadFiles",
-          element: (
-            <ProtectedRoute>
-              <ReadFiles />
-            </ProtectedRoute>
-          ),
-        },
-
-        // 🧑‍💻 Home Route (accessible to all)
-        {
-          path: "home",
-          element: <Home />,
-        },
-
-        // 🧑‍💻 Guest Routes
-        {
-          path: "login",
-          element: (
-            <GuestRoute>
-              <Login />
-            </GuestRoute>
-          ),
-        },
-        {
-          path: "register",
-          element: (
-            <GuestRoute>
-              <Register />
-            </GuestRoute>
-          ),
-        },
-        {
-          path: "forgetPassword",
-          element: (
-            <GuestRoute>
-              <ForgetPassword />
-            </GuestRoute>
-          ),
-        },
-        {
-          path: "resetPassword",
-          element: (
-            <GuestRoute>
-              <ResetPassword />
-            </GuestRoute>
-          ),
-        },
-
-        // 📁 Public Route
-        { path: "ReadShared", element: <ReadSharedFile /> },
-
-        // ❌ Not Found
-        { path: "*", element: <NotFound /> },
-      ],
-    },
-  ],
+// ✅ Use HashRouter instead of BrowserRouter for GitHub Pages
+const router = createHashRouter([
   {
-    basename: "/", // ✅ works for GitHub Pages or subdirectory deployments
-  }
-);
+    path: "/",
+    element: <Layout />,
+    children: [
+      { index: true, element: <Navigate to="/home" replace /> },
+
+      // 🔐 Protected Routes
+      {
+        path: "code/:fileId",
+        element: (
+          <ProtectedRoute>
+            <CodeEditor />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "code",
+        element: (
+          <ProtectedRoute>
+            <CodeEditor />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "bot",
+        element: (
+          <ProtectedRoute>
+            <Chatbot />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "CreateFile",
+        element: (
+          <ProtectedRoute>
+            <CreateFile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "ReadFiles",
+        element: (
+          <ProtectedRoute>
+            <ReadFiles />
+          </ProtectedRoute>
+        ),
+      },
+
+      // 🧑‍💻 Home Route (accessible to all)
+      {
+        path: "home",
+        element: <Home />,
+      },
+
+      // 🧑‍💻 Guest Routes
+      {
+        path: "login",
+        element: (
+          <GuestRoute>
+            <Login />
+          </GuestRoute>
+        ),
+      },
+      {
+        path: "register",
+        element: (
+          <GuestRoute>
+            <Register />
+          </GuestRoute>
+        ),
+      },
+      {
+        path: "forgetPassword",
+        element: (
+          <GuestRoute>
+            <ForgetPassword />
+          </GuestRoute>
+        ),
+      },
+      {
+        path: "resetPassword",
+        element: (
+          <GuestRoute>
+            <ResetPassword />
+          </GuestRoute>
+        ),
+      },
+
+      // 📁 Public Route
+      { path: "ReadShared", element: <ReadSharedFile /> },
+
+      // ❌ Not Found
+      { path: "*", element: <NotFound /> },
+    ],
+  },
+]);
 
 function App() {
   return (

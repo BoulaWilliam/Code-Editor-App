@@ -107,7 +107,7 @@ export default function CreateFile() {
     };
 
     return (
-        <div className='container mb-52 flex items-center justify-center flex-grow'>
+        <div className='container mb-52 flex items-center justify-center mt-20 flex-grow'>
             <div className="max-w-3xl mx-auto bg-[#4B4B4B] p-8 shadow-lg shadow-[#292828] rounded-xl mt-10">
                 <h2 className="text-3xl font-bold mb-6 text-center text-white">Create New File</h2>
                 <div className="space-y-4">
