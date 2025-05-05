@@ -1,38 +1,34 @@
-import './App.css';
-import {
-  createHashRouter,
-  RouterProvider,
-  Navigate,
-} from 'react-router-dom';
+import "./App.css";
+import { createHashRouter, RouterProvider, Navigate } from "react-router-dom";
 
-import CodeEditor from './Pages/CodeEditor/CodeEditor';
-import Layout from './Components/Layout/Layout';
-import Login from './Pages/Login/Login';
-import Register from './Pages/Register/Register';
-import UserProvider from './Contexts/UserContext/User.context';
-import CreateFile from './Pages/CreateFile/CreateFile';
-import ReadFiles from './Pages/ReadFiles/ReadFiles';
-import ReadSharedFile from './Pages/ReadSharedFile/ReadSharedFile';
-import { Toaster } from 'react-hot-toast';
-import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute';
-import GuestRoute from './Components/GuestRoute/GuestRoute';
-import NotFound from './Components/NotFound/NotFound';
-import Home from './Pages/Home/Home';
-import Chatbot from './Pages/Chatbot/Chatbot';
-import ForgetPassword from './Pages/ForgetPassword/ForgetPassword';
-import ResetPassword from './Pages/ResetPassword/ResetPassword';
+import CodeEditor from "./Pages/CodeEditor/CodeEditor";
+import Layout from "./Components/Layout/Layout";
+import Login from "./Pages/Login/Login";
+import Register from "./Pages/Register/Register";
+import UserProvider from "./Contexts/UserContext/User.context";
+import CreateFile from "./Pages/CreateFile/CreateFile";
+import ReadFiles from "./Pages/ReadFiles/ReadFiles";
+import ReadSharedFile from "./Pages/ReadSharedFile/ReadSharedFile";
+import { Toaster } from "react-hot-toast";
+import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute";
+import GuestRoute from "./Components/GuestRoute/GuestRoute";
+import NotFound from "./Components/NotFound/NotFound";
+import Home from "./Pages/Home/Home";
+import Chatbot from "./Pages/Chatbot/Chatbot";
+import ForgetPassword from "./Pages/ForgetPassword/ForgetPassword";
+import ResetPassword from "./Pages/ResetPassword/ResetPassword";
 
 // ✅ Use HashRouter instead of BrowserRouter for GitHub Pages
 const router = createHashRouter([
   {
-    path: '/',
+    path: "/",
     element: <Layout />,
     children: [
       { index: true, element: <Navigate to="/home" replace /> },
 
       // 🔐 Protected Routes
       {
-        path: 'code/:fileId',
+        path: "code/:fileId/:isShared",
         element: (
           <ProtectedRoute>
             <CodeEditor />
@@ -40,7 +36,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'code',
+        path: "code",
         element: (
           <ProtectedRoute>
             <CodeEditor />
@@ -48,7 +44,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'bot',
+        path: "bot",
         element: (
           <ProtectedRoute>
             <Chatbot />
@@ -56,7 +52,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'CreateFile',
+        path: "CreateFile",
         element: (
           <ProtectedRoute>
             <CreateFile />
@@ -64,7 +60,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'ReadFiles',
+        path: "ReadFiles",
         element: (
           <ProtectedRoute>
             <ReadFiles />
@@ -74,13 +70,13 @@ const router = createHashRouter([
 
       // 🧑‍💻 Home Route (accessible to all)
       {
-        path: 'home',
+        path: "home",
         element: <Home />,
       },
 
       // 🧑‍💻 Guest Routes
       {
-        path: 'login',
+        path: "login",
         element: (
           <GuestRoute>
             <Login />
@@ -88,7 +84,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'register',
+        path: "register",
         element: (
           <GuestRoute>
             <Register />
@@ -96,7 +92,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'forgetPassword',
+        path: "forgetPassword",
         element: (
           <GuestRoute>
             <ForgetPassword />
@@ -104,7 +100,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'resetPassword',
+        path: "resetPassword",
         element: (
           <GuestRoute>
             <ResetPassword />
@@ -113,10 +109,17 @@ const router = createHashRouter([
       },
 
       // 📁 Public Route
-      { path: 'ReadShared', element: <ReadSharedFile /> },
+      {
+        path: "ReadShared",
+        element: (
+          <ProtectedRoute>
+            <ReadSharedFile />
+          </ProtectedRoute>
+        ),
+      },
 
       // ❌ Not Found
-      { path: '*', element: <NotFound /> },
+      { path: "*", element: <NotFound /> },
     ],
   },
 ]);
