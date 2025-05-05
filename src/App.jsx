@@ -28,7 +28,7 @@ const router = createHashRouter([
 
       // 🔐 Protected Routes
       {
-        path: "code/:fileId",
+        path: "code/:fileId/:isShared",
         element: (
           <ProtectedRoute>
             <CodeEditor />
@@ -109,7 +109,14 @@ const router = createHashRouter([
       },
 
       // 📁 Public Route
-      { path: "ReadShared", element: <ReadSharedFile /> },
+      {
+        path: "ReadShared",
+        element: (
+          <ProtectedRoute>
+            <ReadSharedFile />
+          </ProtectedRoute>
+        ),
+      },
 
       // ❌ Not Found
       { path: "*", element: <NotFound /> },

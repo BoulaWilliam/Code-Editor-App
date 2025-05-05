@@ -9,7 +9,8 @@ import Editor from "@monaco-editor/react";
 
 export default function CodeEditor() {
   const { token } = useContext(userContext);
-  const { fileId } = useParams();
+  const { fileId, isShared } = useParams();
+  const isSharedBool = isShared === "true";
 
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
@@ -42,30 +43,53 @@ export default function CodeEditor() {
     }
   }, [language, fileId]);
 
+  const fetchFile = async () => {
+    try {
+      const response = await fetch(
+        `https://gradapi.duckdns.org/file?fileId=${fileId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.errorMessage || "Failed to load file.");
+      }
+
+      setCode(data.fileContent);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const fetchSharedFile = async () => {
+    try {
+      const response = await fetch(
+        `https://gradapi.duckdns.org/share?fileShareCode=${fileId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.errorMessage || "Failed to load file.");
+      }
+
+      setCode(data.fileContent);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   useEffect(() => {
     if (!fileId || !token) return;
-
-    const fetchFile = async () => {
-      try {
-        const response = await fetch(
-          `https://gradapi.duckdns.org/file?fileId=${fileId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.errorMessage || "Failed to load file.");
-        }
-
-        setCode(data.fileContent);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-    fetchFile();
+    if (isSharedBool) {
+      fetchSharedFile();
+    } else {
+      fetchFile();
+    }
   }, [fileId, token]);
 
   useEffect(() => {
@@ -101,6 +125,30 @@ export default function CodeEditor() {
       setOutput("❌ Unexpected error: " + err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSharedFileSave = async () => {
+    if (!fileId || !token) return;
+    setSaving(true);
+    try {
+      const response = await fetch("https://gradapi.duckdns.org/share", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          fileShareCode: fileId,
+          newFileContent: code,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.errorMessage || "Save failed.");
+    } catch (err) {
+      alert("❌ Save failed: " + err.message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -227,7 +275,7 @@ export default function CodeEditor() {
                   </button>
                   {fileId && (
                     <button
-                      onClick={handleSave}
+                      onClick={isSharedBool ? handleSharedFileSave : handleSave}
                       disabled={saving}
                       className="bg-gradient-to-r from-[#08AEED] to-[#09E190] hover:opacity-90 px-3 py-2 rounded text-white font-bold text-sm flex items-center gap-2"
                     >
@@ -270,7 +318,11 @@ export default function CodeEditor() {
                 <div className="w-12 bg-[#2a2a2a] text-right text-gray-400 p-2 select-none text-xs leading-6 overflow-hidden font-mono">
                   <pre>
                     {Array.from(
-                      { length: (output || "// Output will be displayed here.").split("\n").length },
+                      {
+                        length: (
+                          output || "// Output will be displayed here."
+                        ).split("\n").length,
+                      },
                       (_, i) => i + 1
                     ).join("\n")}
                   </pre>
