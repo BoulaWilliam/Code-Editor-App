@@ -146,7 +146,7 @@ export default function CodeEditor() {
         }),
       });
       const data = await response.json();
-      toast.success("File Save Successfuly!");
+      toast.success("Shared File Saved Successfuly!");
       if (!response.ok) throw new Error(data.errorMessage || "Save failed.");
     } catch (err) {
       toast.error("❌ Save failed: " + err.message);
@@ -160,17 +160,18 @@ export default function CodeEditor() {
     setSaving(true);
     try {
       const response = await fetch("https://gradapi.duckdns.org/file", {
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           fileId,
-          fileContent: code,
+          newFileContent: code,
         }),
       });
       const data = await response.json();
+      toast.success("File Saved Successfuly!");
       if (!response.ok) throw new Error(data.errorMessage || "Save failed.");
     } catch (err) {
       toast.error("❌ Save failed: " + err.message);
