@@ -72,7 +72,7 @@ export default function Chatbot() {
     };
 
     return (
-        <div className="container flex items-center justify-center flex-grow mt-40 px-4">
+        <div className="container flex items-center justify-center text-start flex-grow mt-20 px-4">
             <div className="bg-[#4B4B4B] rounded-lg shadow-lg shadow-[#292828] p-8 w-full max-w-4xl text-gray-200">
                 <h1 className="text-4xl font-bold text-center mb-6 text-white">
                     What Can I Help With?
