@@ -6,6 +6,7 @@ import gsap from "gsap";
 import Logo from "../../assets/Logo.png";
 import { Play, Save } from "lucide-react";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 import Editor from "@monaco-editor/react";
 
@@ -45,140 +46,132 @@ export default function CodeEditor() {
     }
   }, [language, fileId]);
 
-  const fetchFile = async () => {
-    try {
-      const response = await fetch(
-        `https://gradapi.duckdns.org/file?fileId=${fileId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.errorMessage || "Failed to load file.");
+const fetchFile = async () => {
+  try {
+    const response = await axios.get(
+      `https://gradapi.duckdns.org/file?fileId=${fileId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
       }
+    );
+    setCode(response.data.fileContent);
+  } catch (error) {
+    setError(error.response?.data?.errorMessage || "Failed to load file.");
+  }
+};
 
-      setCode(data.fileContent);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  const fetchSharedFile = async () => {
-    try {
-      const response = await fetch(
-        `https://gradapi.duckdns.org/share?fileShareCode=${fileId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.errorMessage || "Failed to load file.");
+const fetchSharedFile = async () => {
+  try {
+    const response = await axios.get(
+      `https://gradapi.duckdns.org/share?fileShareCode=${fileId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
       }
+    );
+    setCode(response.data.fileContent);
+  } catch (error) {
+    setError(error.response?.data?.errorMessage || "Failed to load file.");
+  }
+};
 
-      setCode(data.fileContent);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+useEffect(() => {
+  if (!fileId || !token) return;
+  if (isSharedBool) {
+    fetchSharedFile();
+  } else {
+    fetchFile();
+  }
+}, [fileId, token]);
 
-  useEffect(() => {
-    if (!fileId || !token) return;
-    if (isSharedBool) {
-      fetchSharedFile();
-    } else {
-      fetchFile();
-    }
-  }, [fileId, token]);
+useEffect(() => {
+  if (svgRef.current) {
+    gsap.fromTo(
+      svgRef.current,
+      { strokeDasharray: 1000, strokeDashoffset: 1000 },
+      {
+        strokeDashoffset: 0,
+        duration: 3,
+        ease: "power3.out",
+      }
+    );
+  }
+}, []);
 
-  useEffect(() => {
-    if (svgRef.current) {
-      gsap.fromTo(
-        svgRef.current,
-        { strokeDasharray: 1000, strokeDashoffset: 1000 },
-        {
-          strokeDashoffset: 0,
-          duration: 3,
-          ease: "power3.out",
-        }
-      );
-    }
-  }, []);
-
-  const handleCompile = async () => {
-    setLoading(true);
-    setOutput("");
-    try {
-      const response = await fetch("https://gradapi.duckdns.org/compile", {
-        method: "POST",
+const handleCompile = async () => {
+  setLoading(true);
+  setOutput("");
+  try {
+    const response = await axios.post(
+      "https://gradapi.duckdns.org/compile",
+      { language, codeToRun: code },
+      {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ language, codeToRun: code }),
-      });
-      const data = await response.json();
-      if (response.ok) setOutput(data.output);
-      else setOutput(`❌ ${data.errorMessage}`);
-    } catch (err) {
-      setOutput("❌ Unexpected error: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      }
+    );
+    setOutput(response.data.output);
+  } catch (error) {
+    const msg = error.response?.data?.errorMessage || error.message;
+    setOutput("❌ " + msg);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const handleSharedFileSave = async () => {
-    if (!fileId || !token) return;
-    setSaving(true);
-    try {
-      const response = await fetch("https://gradapi.duckdns.org/share", {
-        method: "PATCH",
+const handleSharedFileSave = async () => {
+  if (!fileId || !token) return;
+  setSaving(true);
+  try {
+    await axios.patch(
+      "https://gradapi.duckdns.org/share",
+      {
+        fileShareCode: fileId,
+        newFileContent: code,
+      },
+      {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          fileShareCode: fileId,
-          newFileContent: code,
-        }),
-      });
-      const data = await response.json();
-      toast.success("Shared File Saved Successfuly!");
-      if (!response.ok) throw new Error(data.errorMessage || "Save failed.");
-    } catch (err) {
-      toast.error("❌ Save failed: " + err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
+      }
+    );
+    toast.success("Shared File Saved Successfully!");
+  } catch (error) {
+    const msg = error.response?.data?.errorMessage || error.message;
+    toast.error("❌ Save failed: " + msg);
+  } finally {
+    setSaving(false);
+  }
+};
 
-  const handleSave = async () => {
-    if (!fileId || !token) return;
-    setSaving(true);
-    try {
-      const response = await fetch("https://gradapi.duckdns.org/file", {
-        method: "PATCH",
+const handleSave = async () => {
+  if (!fileId || !token) return;
+  setSaving(true);
+  try {
+    await axios.patch(
+      "https://gradapi.duckdns.org/file",
+      {
+        fileId,
+        newFileContent: code,
+      },
+      {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          fileId,
-          newFileContent: code,
-        }),
-      });
-      const data = await response.json();
-      toast.success("File Saved Successfuly!");
-      if (!response.ok) throw new Error(data.errorMessage || "Save failed.");
-    } catch (err) {
-      toast.error("❌ Save failed: " + err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
+      }
+    );
+    toast.success("File Saved Successfully!");
+  } catch (error) {
+    const msg = error.response?.data?.errorMessage || error.message;
+    toast.error("❌ Save failed: " + msg);
+  } finally {
+    setSaving(false);
+  }
+};
+
 
   if (error) {
     return <div className="text-red-500 p-6">Error: {error}</div>;

@@ -18,7 +18,6 @@ import Chatbot from "./Pages/Chatbot/Chatbot";
 import ForgetPassword from "./Pages/ForgetPassword/ForgetPassword";
 import ResetPassword from "./Pages/ResetPassword/ResetPassword";
 
-// ✅ Use HashRouter instead of BrowserRouter for GitHub Pages
 const router = createHashRouter([
   {
     path: "/",
