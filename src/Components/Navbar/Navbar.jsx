@@ -68,7 +68,7 @@ export default function Navbar() {
                             <>
                                 <li><NavLink className={navLinkClass} to="/CreateFile">Created Files</NavLink></li>
                                 <li><NavLink className={navLinkClass} to="/bot">Chatbot</NavLink></li>
-                                <li><NavLink className={navLinkClass} to="/ReadFiles">Read Files</NavLink></li>
+                                <li><NavLink className={navLinkClass} to="/ReadFiles">My Files</NavLink></li>
                                 <li><NavLink className={navLinkClass} to="/ReadShared">Read Shared</NavLink></li>
                                 <li><NavLink className={navLinkClass} to="/code">Code Editor</NavLink></li>
                                 <li><LogoutButton /></li>
