@@ -117,27 +117,25 @@ export default function CodeEditor() {
     setLoading(true);
     setOutput("");
     try {
-      console.log(language);
-
-      if (
-        language.toLowerCase() !== "python" &&
-        language.toLowerCase() !== "javascript"
-      ) {
-        const response = await fetch("https://gradapi.duckdns.org/compile", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ language, codeToRun: code }),
-        });
-        const data = await response.json();
-        if (response.ok) setOutput(data.output);
-        else setOutput(`❌ ${data.errorMessage}`);
-      } else {
-        const output = await sendCode({ language: language, codeToRun: code });
-        setOutput(output);
-      }
+      // if (
+      //   language.toLowerCase() !== "python" &&
+      //   language.toLowerCase() !== "javascript"
+      // ) {
+      //   const response = await fetch("https://gradapi.duckdns.org/compile", {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //     body: JSON.stringify({ language, codeToRun: code }),
+      //   });
+      //   const data = await response.json();
+      //   if (response.ok) setOutput(data.output);
+      //   else setOutput(`❌ ${data.errorMessage}`);
+      // } else {
+      // }
+      const output = await sendCode({ language: language, codeToRun: code });
+      setOutput(output);
     } catch (err) {
       setOutput("❌ Unexpected error: " + err.message);
     } finally {
