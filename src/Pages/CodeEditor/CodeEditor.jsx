@@ -8,11 +8,16 @@ import { Play, Save } from "lucide-react";
 import toast from "react-hot-toast";
 
 import Editor from "@monaco-editor/react";
+import { useWebSocket } from "../../hooks/useWebSocket";
 
 export default function CodeEditor() {
   const { token } = useContext(userContext);
   const { fileId, isShared } = useParams();
   const isSharedBool = isShared === "true";
+
+  const { sendCode, sendCommand, exit } = useWebSocket(
+    "wss://gradapi.duckdns.org/compile-ws"
+  );
 
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
@@ -112,21 +117,40 @@ export default function CodeEditor() {
     setLoading(true);
     setOutput("");
     try {
-      const response = await fetch("https://gradapi.duckdns.org/compile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ language, codeToRun: code }),
-      });
-      const data = await response.json();
-      if (response.ok) setOutput(data.output);
-      else setOutput(`❌ ${data.errorMessage}`);
+      console.log(language);
+
+      if (
+        language.toLowerCase() !== "python" &&
+        language.toLowerCase() !== "javascript"
+      ) {
+        const response = await fetch("https://gradapi.duckdns.org/compile", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ language, codeToRun: code }),
+        });
+        const data = await response.json();
+        if (response.ok) setOutput(data.output);
+        else setOutput(`❌ ${data.errorMessage}`);
+      } else {
+        const output = await sendCode({ language: language, codeToRun: code });
+        setOutput(output);
+      }
     } catch (err) {
       setOutput("❌ Unexpected error: " + err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const sendConsoleCommand = async (command) => {
+    try {
+      const commandOutput = await sendCommand({ command });
+      setOutput(commandOutput);
+    } catch (err) {
+      setOutput("❌ Unexpected error: " + err.message);
     }
   };
 
@@ -308,7 +332,7 @@ export default function CodeEditor() {
                 />
               </div>
             </motion.div>
-
+            {/* 
             <motion.div
               className="flex-1 bg-[#000] overflow-auto p-4 md:p-6 shadow-lg shadow-[#444444] min-h-[200px]"
               initial={{ opacity: 0, y: 20 }}
@@ -318,6 +342,7 @@ export default function CodeEditor() {
               <h2 className="text-base md:text-lg flex items-start font-semibold mb-2">
                 Output
               </h2>
+
               <div className="flex bg-[#333333] rounded overflow-hidden">
                 <div className="w-12 bg-[#2a2a2a] text-right text-gray-400 p-2 select-none text-xs leading-6 overflow-hidden font-mono">
                   <pre>
@@ -332,13 +357,76 @@ export default function CodeEditor() {
                   </pre>
                 </div>
                 <pre className="flex-1 p-2 text-green-400 whitespace-pre-wrap break-words overflow-auto text-sm md:text-base font-mono">
-                  {output || "// Output will be displayed here."}
+                  {output}
                 </pre>
               </div>
-            </motion.div>
+            </motion.div> */}
+            <ConsoleOutput
+              output={output}
+              onRunCommand={(command) => {
+                sendConsoleCommand(command);
+              }}
+            />
           </div>
         </motion.div>
       </div>
     </section>
   );
 }
+const ConsoleOutput = ({ output, onRunCommand }) => {
+  const [command, setCommand] = useState("");
+
+  return (
+    <motion.div
+      className="flex flex-col bg-[#000] overflow-auto p-4 md:p-6 shadow-lg shadow-[#444444] min-h-[300px] rounded"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4 }}
+    >
+      <h2 className="text-base md:text-lg font-semibold mb-2 text-white">
+        Console
+      </h2>
+
+      <div className="flex bg-[#333333] rounded overflow-hidden flex-1">
+        {/* Line Numbers */}
+        <div className="w-12 bg-[#2a2a2a] text-right text-gray-400 p-2 select-none text-xs leading-6 overflow-hidden font-mono">
+          <pre>
+            {Array.from(
+              {
+                length: (output || "// Output will be displayed here.").split(
+                  "\n"
+                ).length,
+              },
+              (_, i) => i + 1
+            ).join("\n")}
+          </pre>
+        </div>
+
+        {/* Console output */}
+        <pre className="flex-1 p-2 text-green-400 whitespace-pre-wrap break-words overflow-auto text-sm md:text-base text-start font-mono">
+          {output}
+        </pre>
+      </div>
+
+      {/* Command input */}
+      <div className="flex items-center mt-4">
+        <input
+          type="text"
+          value={command}
+          onChange={(e) => setCommand(e.target.value)}
+          placeholder="Type a command..."
+          className="flex-1 bg-[#222] text-white p-2 rounded-l font-mono focus:outline-none text-sm md:text-base"
+        />
+        <button
+          onClick={() => {
+            onRunCommand(command);
+            setCommand("");
+          }}
+          className="bg-green-600 hover:bg-green-500 text-white p-2 rounded-r font-semibold"
+        >
+          Run
+        </button>
+      </div>
+    </motion.div>
+  );
+};
