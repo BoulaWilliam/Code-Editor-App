@@ -117,23 +117,7 @@ export default function CodeEditor() {
     setLoading(true);
     setOutput("");
     try {
-      // if (
-      //   language.toLowerCase() !== "python" &&
-      //   language.toLowerCase() !== "javascript"
-      // ) {
-      //   const response = await fetch("https://gradapi.duckdns.org/compile", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //     body: JSON.stringify({ language, codeToRun: code }),
-      //   });
-      //   const data = await response.json();
-      //   if (response.ok) setOutput(data.output);
-      //   else setOutput(`❌ ${data.errorMessage}`);
-      // } else {
-      // }
+
       const output = await sendCode({ language: language, codeToRun: code });
       setOutput(output);
     } catch (err) {
@@ -283,7 +267,7 @@ export default function CodeEditor() {
           {/* Main Code Area */}
           <div className="flex flex-col lg:flex-row flex-1 overflow-auto">
             <motion.div
-              className="flex-1 bg-[#555555] p-4 md:p-6 flex flex-col relative shadow-lg shadow-[#444444] min-h-[300px]"
+              className="w-full lg:w-1/2 bg-[#555555] p-4 md:p-6 flex flex-col relative shadow-lg shadow-[#444444] min-h-[300px]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -330,60 +314,54 @@ export default function CodeEditor() {
                 />
               </div>
             </motion.div>
-            {/* 
-            <motion.div
-              className="flex-1 bg-[#000] overflow-auto p-4 md:p-6 shadow-lg shadow-[#444444] min-h-[200px]"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <h2 className="text-base md:text-lg flex items-start font-semibold mb-2">
-                Output
-              </h2>
 
-              <div className="flex bg-[#333333] rounded overflow-hidden">
-                <div className="w-12 bg-[#2a2a2a] text-right text-gray-400 p-2 select-none text-xs leading-6 overflow-hidden font-mono">
-                  <pre>
-                    {Array.from(
-                      {
-                        length: (
-                          output || "// Output will be displayed here."
-                        ).split("\n").length,
-                      },
-                      (_, i) => i + 1
-                    ).join("\n")}
-                  </pre>
-                </div>
-                <pre className="flex-1 p-2 text-green-400 whitespace-pre-wrap break-words overflow-auto text-sm md:text-base font-mono">
-                  {output}
-                </pre>
-              </div>
-            </motion.div> */}
-            <ConsoleOutput
-              output={output}
-              onRunCommand={(command) => {
-                sendConsoleCommand(command);
-              }}
-            />
+            <div className="w-full lg:w-1/2">
+              <ConsoleOutput
+                output={output}
+                onRunCommand={(command) => {
+                  sendConsoleCommand(command);
+                }}
+              />
+            </div>
           </div>
         </motion.div>
       </div>
     </section>
   );
+
 }
 const ConsoleOutput = ({ output, onRunCommand }) => {
   const [command, setCommand] = useState("");
 
   return (
     <motion.div
-      className="flex flex-col bg-[#000] overflow-auto p-4 md:p-6 shadow-lg shadow-[#444444] min-h-[300px] rounded"
+      className="flex flex-col bg-[#000] overflow-auto  h-full  lg:h-full p-4 md:p-6 shadow-lg shadow-[#444444] min-h-[300px] rounded"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <h2 className="text-base md:text-lg font-semibold mb-2 text-white">
-        Console
-      </h2>
+      <h2 className="font-semibold text-[1.8rem]">Output</h2>
+
+
+      {/* Command input */}
+      <div className="flex items-center mt-4">
+        <input
+          type="text"
+          value={command}
+          onChange={(e) => setCommand(e.target.value)}
+          placeholder="Pass Your Input : ..."
+          className="flex-1 bg-[#222] text-white p-2 rounded my-1 font-mono focus:outline-none text-sm md:text-base"
+        />
+        <button
+          onClick={() => {
+            onRunCommand(command);
+            setCommand("");
+          }}
+          className="bg-green-600 hover:bg-green-500 text-white px-3 p-2 rounded "
+        >
+          pass
+        </button>
+      </div>
 
       <div className="flex bg-[#333333] rounded overflow-hidden flex-1">
         {/* Line Numbers */}
@@ -406,25 +384,7 @@ const ConsoleOutput = ({ output, onRunCommand }) => {
         </pre>
       </div>
 
-      {/* Command input */}
-      <div className="flex items-center mt-4">
-        <input
-          type="text"
-          value={command}
-          onChange={(e) => setCommand(e.target.value)}
-          placeholder="Type a command..."
-          className="flex-1 bg-[#222] text-white p-2 rounded-l font-mono focus:outline-none text-sm md:text-base"
-        />
-        <button
-          onClick={() => {
-            onRunCommand(command);
-            setCommand("");
-          }}
-          className="bg-green-600 hover:bg-green-500 text-white p-2 rounded-r font-semibold"
-        >
-          Run
-        </button>
-      </div>
+
     </motion.div>
   );
 };
