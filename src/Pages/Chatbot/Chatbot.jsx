@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 export default function Chatbot() {
@@ -10,9 +11,8 @@ export default function Chatbot() {
     const textareaRef = useRef(null);
 
     useEffect(() => {
-        fetch('https://gradapi.duckdns.org/ai/models')
-            .then(res => res.json())
-            .then(data => setModels(data.allModels))
+        axios.get('https://gradapi.duckdns.org/ai/models')
+            .then(res => setModels(res.data.allModels))
             .catch(err => console.error('Error fetching models:', err));
     }, []);
 
@@ -20,13 +20,13 @@ export default function Chatbot() {
         if (!message.trim()) return;
         setLoading(true);
         try {
-            const res = await fetch('https://gradapi.duckdns.org/ai', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: selectedModel || null, message })
+            const res = await axios.post('https://gradapi.duckdns.org/ai', {
+                model: selectedModel || null,
+                message
+            }, {
+                headers: { 'Content-Type': 'application/json' }
             });
-            const data = await res.json();
-            setResponse(data.response);
+            setResponse(res.data.response);
         } catch (error) {
             console.error('Error sending message:', error);
         } finally {
