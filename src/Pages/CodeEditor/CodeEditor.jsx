@@ -117,7 +117,6 @@ export default function CodeEditor() {
     setLoading(true);
     setOutput("");
     try {
-
       const output = await sendCode({ language: language, codeToRun: code });
       setOutput(output);
     } catch (err) {
@@ -328,20 +327,18 @@ export default function CodeEditor() {
       </div>
     </section>
   );
-
 }
 const ConsoleOutput = ({ output, onRunCommand }) => {
   const [command, setCommand] = useState("");
 
   return (
     <motion.div
-      className="flex flex-col bg-[#000] overflow-auto  h-full  lg:h-full p-4 md:p-6 shadow-lg shadow-[#444444] min-h-[300px] rounded"
+      className="flex flex-col bg-[#2d2d2d55] overflow-auto  h-full  lg:h-full p-4 md:p-6 shadow-lg shadow-[#444444] min-h-[300px] rounded"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
       <h2 className="font-semibold text-[1.8rem]">Output</h2>
-
 
       {/* Command input */}
       <div className="flex items-center mt-4">
@@ -380,11 +377,9 @@ const ConsoleOutput = ({ output, onRunCommand }) => {
 
         {/* Console output */}
         <pre className="flex-1 p-2 text-green-400 whitespace-pre-wrap break-words overflow-auto text-sm md:text-base text-start font-mono">
-          {output}
+          {output.substring(8)}
         </pre>
       </div>
-
-
     </motion.div>
   );
 };
