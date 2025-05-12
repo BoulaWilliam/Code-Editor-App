@@ -10,21 +10,12 @@ export default function ReadSharedFile() {
   const [newFileContent, setNewFileContent] = useState("");
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const navigate = useNavigate();
+  
   const handleRead = async () => {
     goToCodeEditor(code);
     setFileData(null);
     setError("");
     setUpdateSuccess(false);
-    // try {
-    //   const { data } = await axios.get("https://gradapi.duckdns.org/share", {
-    //     params: { fileShareCode: code },
-    //   });
-    //   setFileData(data);
-    //   setNewFileName(data.fileName);
-    //   setNewFileContent(data.fileContent);
-    // } catch (err) {
-    //   setError(err.response?.data?.errorMessage || err.message);
-    // }
   };
 
   const goToCodeEditor = (fileShareCode) => {

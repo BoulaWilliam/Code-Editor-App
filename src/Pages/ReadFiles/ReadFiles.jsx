@@ -129,7 +129,7 @@ export default function ReadFiles() {
         <div className="w-screen min-h-screen text-white px-4 py-10 overflow-auto">
             <div className="max-w-7xl mx-auto">
                 <h2 className="text-3xl font-extrabold text-white mb-12 mt-[50px] text-center">
-                    All Files
+                    My Files
                 </h2>
 
                 {error && <div className="text-red-400 text-center mb-6">❌ {error}</div>}
