@@ -6,14 +6,18 @@ import gsap from "gsap";
 import Logo from "../../assets/Logo.png";
 import { Play, Save } from "lucide-react";
 import toast from "react-hot-toast";
-import axios from "axios";
 
 import Editor from "@monaco-editor/react";
+import { useWebSocket } from "../../hooks/useWebSocket";
 
 export default function CodeEditor() {
   const { token } = useContext(userContext);
   const { fileId, isShared } = useParams();
   const isSharedBool = isShared === "true";
+
+  const { sendCode, sendCommand, exit } = useWebSocket(
+    "wss://gradapi.duckdns.org/compile-ws"
+  );
 
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
@@ -46,132 +50,159 @@ export default function CodeEditor() {
     }
   }, [language, fileId]);
 
-const fetchFile = async () => {
-  try {
-    const response = await axios.get(
-      `https://gradapi.duckdns.org/file?fileId=${fileId}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
+  const fetchFile = async () => {
+    try {
+      const response = await fetch(
+        `https://gradapi.duckdns.org/file?fileId=${fileId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.errorMessage || "Failed to load file.");
       }
-    );
-    setCode(response.data.fileContent);
-  } catch (error) {
-    setError(error.response?.data?.errorMessage || "Failed to load file.");
-  }
-};
 
-const fetchSharedFile = async () => {
-  try {
-    const response = await axios.get(
-      `https://gradapi.duckdns.org/share?fileShareCode=${fileId}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
+      setCode(data.fileContent);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const fetchSharedFile = async () => {
+    try {
+      const response = await fetch(
+        `https://gradapi.duckdns.org/share?fileShareCode=${fileId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.errorMessage || "Failed to load file.");
       }
-    );
-    setCode(response.data.fileContent);
-  } catch (error) {
-    setError(error.response?.data?.errorMessage || "Failed to load file.");
-  }
-};
 
-useEffect(() => {
-  if (!fileId || !token) return;
-  if (isSharedBool) {
-    fetchSharedFile();
-  } else {
-    fetchFile();
-  }
-}, [fileId, token]);
+      setCode(data.fileContent);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-useEffect(() => {
-  if (svgRef.current) {
-    gsap.fromTo(
-      svgRef.current,
-      { strokeDasharray: 1000, strokeDashoffset: 1000 },
-      {
-        strokeDashoffset: 0,
-        duration: 3,
-        ease: "power3.out",
+  useEffect(() => {
+    if (!fileId || !token) return;
+    if (isSharedBool) {
+      fetchSharedFile();
+    } else {
+      fetchFile();
+    }
+  }, [fileId, token]);
+
+  useEffect(() => {
+    if (svgRef.current) {
+      gsap.fromTo(
+        svgRef.current,
+        { strokeDasharray: 1000, strokeDashoffset: 1000 },
+        {
+          strokeDashoffset: 0,
+          duration: 3,
+          ease: "power3.out",
+        }
+      );
+    }
+  }, []);
+
+  const handleCompile = async () => {
+    setLoading(true);
+    setOutput("");
+    try {
+      console.log(language);
+
+      if (
+        language.toLowerCase() !== "python" &&
+        language.toLowerCase() !== "javascript"
+      ) {
+        const response = await fetch("https://gradapi.duckdns.org/compile", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ language, codeToRun: code }),
+        });
+        const data = await response.json();
+        if (response.ok) setOutput(data.output);
+        else setOutput(`❌ ${data.errorMessage}`);
+      } else {
+        const output = await sendCode({ language: language, codeToRun: code });
+        setOutput(output);
       }
-    );
-  }
-}, []);
+    } catch (err) {
+      setOutput("❌ Unexpected error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-const handleCompile = async () => {
-  setLoading(true);
-  setOutput("");
-  try {
-    const response = await axios.post(
-      "https://gradapi.duckdns.org/compile",
-      { language, codeToRun: code },
-      {
+  const sendConsoleCommand = async (command) => {
+    try {
+      const commandOutput = await sendCommand({ command });
+      setOutput(commandOutput);
+    } catch (err) {
+      setOutput("❌ Unexpected error: " + err.message);
+    }
+  };
+
+  const handleSharedFileSave = async () => {
+    if (!fileId || !token) return;
+    setSaving(true);
+    try {
+      const response = await fetch("https://gradapi.duckdns.org/share", {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      }
-    );
-    setOutput(response.data.output);
-  } catch (error) {
-    const msg = error.response?.data?.errorMessage || error.message;
-    setOutput("❌ " + msg);
-  } finally {
-    setLoading(false);
-  }
-};
+        body: JSON.stringify({
+          fileShareCode: fileId,
+          newFileContent: code,
+        }),
+      });
+      const data = await response.json();
+      toast.success("Shared File Saved Successfuly!");
+      if (!response.ok) throw new Error(data.errorMessage || "Save failed.");
+    } catch (err) {
+      toast.error("❌ Save failed: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
-const handleSharedFileSave = async () => {
-  if (!fileId || !token) return;
-  setSaving(true);
-  try {
-    await axios.patch(
-      "https://gradapi.duckdns.org/share",
-      {
-        fileShareCode: fileId,
-        newFileContent: code,
-      },
-      {
+  const handleSave = async () => {
+    if (!fileId || !token) return;
+    setSaving(true);
+    try {
+      const response = await fetch("https://gradapi.duckdns.org/file", {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      }
-    );
-    toast.success("Shared File Saved Successfully!");
-  } catch (error) {
-    const msg = error.response?.data?.errorMessage || error.message;
-    toast.error("❌ Save failed: " + msg);
-  } finally {
-    setSaving(false);
-  }
-};
-
-const handleSave = async () => {
-  if (!fileId || !token) return;
-  setSaving(true);
-  try {
-    await axios.patch(
-      "https://gradapi.duckdns.org/file",
-      {
-        fileId,
-        newFileContent: code,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    toast.success("File Saved Successfully!");
-  } catch (error) {
-    const msg = error.response?.data?.errorMessage || error.message;
-    toast.error("❌ Save failed: " + msg);
-  } finally {
-    setSaving(false);
-  }
-};
-
+        body: JSON.stringify({
+          fileId,
+          newFileContent: code,
+        }),
+      });
+      const data = await response.json();
+      toast.success("File Saved Successfuly!");
+      if (!response.ok) throw new Error(data.errorMessage || "Save failed.");
+    } catch (err) {
+      toast.error("❌ Save failed: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (error) {
     return <div className="text-red-500 p-6">Error: {error}</div>;
@@ -301,7 +332,7 @@ const handleSave = async () => {
                 />
               </div>
             </motion.div>
-
+            {/* 
             <motion.div
               className="flex-1 bg-[#000] overflow-auto p-4 md:p-6 shadow-lg shadow-[#444444] min-h-[200px]"
               initial={{ opacity: 0, y: 20 }}
@@ -311,6 +342,7 @@ const handleSave = async () => {
               <h2 className="text-base md:text-lg flex items-start font-semibold mb-2">
                 Output
               </h2>
+
               <div className="flex bg-[#333333] rounded overflow-hidden">
                 <div className="w-12 bg-[#2a2a2a] text-right text-gray-400 p-2 select-none text-xs leading-6 overflow-hidden font-mono">
                   <pre>
@@ -325,13 +357,76 @@ const handleSave = async () => {
                   </pre>
                 </div>
                 <pre className="flex-1 p-2 text-green-400 whitespace-pre-wrap break-words overflow-auto text-sm md:text-base font-mono">
-                  {output || "// Output will be displayed here."}
+                  {output}
                 </pre>
               </div>
-            </motion.div>
+            </motion.div> */}
+            <ConsoleOutput
+              output={output}
+              onRunCommand={(command) => {
+                sendConsoleCommand(command);
+              }}
+            />
           </div>
         </motion.div>
       </div>
     </section>
   );
 }
+const ConsoleOutput = ({ output, onRunCommand }) => {
+  const [command, setCommand] = useState("");
+
+  return (
+    <motion.div
+      className="flex flex-col bg-[#000] overflow-auto p-4 md:p-6 shadow-lg shadow-[#444444] min-h-[300px] rounded"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4 }}
+    >
+      <h2 className="text-base md:text-lg font-semibold mb-2 text-white">
+        Console
+      </h2>
+
+      <div className="flex bg-[#333333] rounded overflow-hidden flex-1">
+        {/* Line Numbers */}
+        <div className="w-12 bg-[#2a2a2a] text-right text-gray-400 p-2 select-none text-xs leading-6 overflow-hidden font-mono">
+          <pre>
+            {Array.from(
+              {
+                length: (output || "// Output will be displayed here.").split(
+                  "\n"
+                ).length,
+              },
+              (_, i) => i + 1
+            ).join("\n")}
+          </pre>
+        </div>
+
+        {/* Console output */}
+        <pre className="flex-1 p-2 text-green-400 whitespace-pre-wrap break-words overflow-auto text-sm md:text-base text-start font-mono">
+          {output}
+        </pre>
+      </div>
+
+      {/* Command input */}
+      <div className="flex items-center mt-4">
+        <input
+          type="text"
+          value={command}
+          onChange={(e) => setCommand(e.target.value)}
+          placeholder="Type a command..."
+          className="flex-1 bg-[#222] text-white p-2 rounded-l font-mono focus:outline-none text-sm md:text-base"
+        />
+        <button
+          onClick={() => {
+            onRunCommand(command);
+            setCommand("");
+          }}
+          className="bg-green-600 hover:bg-green-500 text-white p-2 rounded-r font-semibold"
+        >
+          Run
+        </button>
+      </div>
+    </motion.div>
+  );
+};
