@@ -8,6 +8,20 @@ export const useWebSocket = (url) => {
 
     socket.onopen = () => {
       console.log("WebSocket opened:", url);
+
+      // Set a heartbeat to keep the connection alive
+      const heartbeatInterval = setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN) {
+          console.log("Sending ping...");
+          socket.send(JSON.stringify({ type: "ping" })); // You can replace this with any kind of ping message your server expects.
+        }
+      }, 30000); // Send ping every 30 seconds (adjust as necessary)
+
+      // Clear the heartbeat interval when the socket closes
+      socket.onclose = () => {
+        console.log("WebSocket closed:", url);
+        clearInterval(heartbeatInterval);
+      };
     };
 
     socket.onclose = () => {
