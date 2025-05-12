@@ -117,23 +117,6 @@ export default function CodeEditor() {
     setLoading(true);
     setOutput("");
     try {
-      // if (
-      //   language.toLowerCase() !== "python" &&
-      //   language.toLowerCase() !== "javascript"
-      // ) {
-      //   const response = await fetch("https://gradapi.duckdns.org/compile", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //     body: JSON.stringify({ language, codeToRun: code }),
-      //   });
-      //   const data = await response.json();
-      //   if (response.ok) setOutput(data.output);
-      //   else setOutput(`❌ ${data.errorMessage}`);
-      // } else {
-      // }
       const output = await sendCode({ language: language, codeToRun: code });
       setOutput(output);
     } catch (err) {
@@ -376,7 +359,7 @@ const ConsoleOutput = ({ output, onRunCommand }) => {
 
   return (
     <motion.div
-      className="flex flex-col bg-[#000] overflow-auto p-4 md:p-6 shadow-lg shadow-[#444444] min-h-[300px] rounded"
+      className="flex flex-col bg-[#5b5b5b] overflow-auto p-4 md:p-6 shadow-lg shadow-[#444444] min-h-[300px] rounded w-[40%]"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
