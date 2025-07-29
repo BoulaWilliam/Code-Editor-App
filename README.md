@@ -101,14 +101,7 @@ npm run dev
 
 <br>
 
-## **📸 Screenshots**
 
-> ![Editor Preview](https://i.imgur.com/your-image.png)
-> *Main Editor Interface with Monaco and Dark Mode Support*
-
-*(Replace the link above with an actual screenshot from your app if desired.)*
-
-<br>
 
 ## **📚 License**
 
